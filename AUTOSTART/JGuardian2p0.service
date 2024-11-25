@@ -1,0 +1,13 @@
+[Unit]
+Description=JGuardian2p0
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+Environment=LD_LIBRARY_PATH=/home/fisitron/JGuardian2p0/LIB
+ExecStart=/bin/bash /home/fisitron/JGuardian2p0/JGuardian2p0.sh
+
+[Install]
+WantedBy=multi-user.target
