@@ -1,6 +1,13 @@
 //******************************************************************************************************************//
 #include "JGuardian.h"
 
+using namespace std;
+using namespace CPlusPlusLogging;
+
+Logger* pLogger = NULL; // Create the object pointer for Logger Class
+
+
+
 //****************************************************************//
 bool toggle = true;
 typedef struct JGuardian_param
@@ -104,7 +111,14 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
             CURLcode res = curl_easy_perform(curl_req);
             /* Check for errors */
             if(res != CURLE_OK)
+            {
                 printf("curl_easy_perform() MOTOPOMPA failed: %s\r\n",curl_easy_strerror(res));
+                std::ostringstream ss;
+                ss << endl;
+                ss << "\t" << "curl_easy_perform() MOTOPOMPA failed " << curl_easy_strerror(res)<< endl;
+                pLogger->info(ss);
+            }
+
             return true;
         }
 
@@ -116,7 +130,13 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
             CURLcode res = curl_easy_perform(curl_req);
             /* Check for errors */
             if(res != CURLE_OK)
+            {
                 printf("curl_easy_perform() ELETTROPOMPA failed: %s\r\n",curl_easy_strerror(res));
+                std::ostringstream ss;
+                ss << endl;
+                ss << "\t" << "curl_easy_perform() ELETTROPOMPA failed " << curl_easy_strerror(res)<< endl;
+                pLogger->info(ss);
+            }
             return true;
         }
 
@@ -129,7 +149,13 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
             CURLcode res = curl_easy_perform(curl_req);
             /* Check for errors */
             if(res != CURLE_OK)
+            {
                 printf("curl_easy_perform() JOKEY failed: %s\r\n",curl_easy_strerror(res));
+                std::ostringstream ss;
+                ss << endl;
+                ss << "\t" << "curl_easy_perform() JOKEY failed " << curl_easy_strerror(res)<< endl;
+                pLogger->info(ss);
+            }
             return true;
         }
 
@@ -142,7 +168,13 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
             CURLcode res = curl_easy_perform(curl_req);
             /* Check for errors */
             if(res != CURLE_OK)
+            {
                 printf("curl_easy_perform() SPRINKLER failed: %s\r\n",curl_easy_strerror(res));
+                std::ostringstream ss;
+                ss << endl;
+                ss << "\t" << "curl_easy_perform() SPRINKLER failed " << curl_easy_strerror(res)<< endl;
+                pLogger->info(ss);
+            }
             return true;
         }
 
@@ -220,9 +252,9 @@ MQTTAsync_connectOptions conn_opts;
 using json = nlohmann::json;
 
 #define ADDRESS_RT  "mqtt://mqtt.datasmart.cloud:1883"
-#define CLIENTID    "projects/jguardian/locations/europe-west1/registries/j-guardian-v1/devices/Device-testdev3"
-#define TOPIC_RT    "/application/jguardian/devices/Device-testdev3/events"
-#define TOPIC_SUB   "/application/jguardian/devices/Device-testdev3/commands/#"
+#define CLIENTID    "projects/jguardian/locations/europe-west1/registries/j-guardian-v1/devices/Device-testdev4"
+#define TOPIC_RT    "/application/jguardian/devices/Device-testdev4/events"
+#define TOPIC_SUB   "/application/jguardian/devices/Device-testdev4/commands/#"
 #define QOS         1
 #define TIMEOUT    200000L
 
@@ -249,12 +281,12 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
 
     //char cmd;
     //int command;
-    int ret = 0;
+    //int ret = 0;
     //scanf(messagePayload,"{\"c\":\"%d\"}",&command);
 
 
     //********************************************************************************************************//
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_rele_camera\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_rele_camera\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO ATTIVAZIONE RELE CAMERA\r\n");
 
@@ -264,7 +296,7 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
 
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_rele_camera\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_rele_camera\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO DISATTIVAZIONE RELE CAMERA\r\n");
 
@@ -274,7 +306,7 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
     }
 
     //************************************************************************************************//
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_rele_luci\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_rele_luci\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO ATTIVAZIONE RELE LUCI\r\n");
 
@@ -283,7 +315,7 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
         line_rele_luci_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_rele_luci\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_rele_luci\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO DISATTIVAZIONE RELE LUCI\r\n");
 
@@ -293,56 +325,56 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
     }
 
     //**************************************************************************************************//
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_start_ep\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_ep\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_START_ON\r\n");
         send_curl_request(ELETTROPOMPA,curl_EP_SET_START_ON);
         line_rele_start_ep_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_start_ep\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_ep\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_START_OFFr\n");
         send_curl_request(ELETTROPOMPA,curl_EP_SET_START_OFF);
         line_rele_start_ep_status = false;
     }
 
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_inib_ep\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_ep\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_INIBIZIONE_ON\r\n");
         send_curl_request(ELETTROPOMPA,curl_EP_SET_INIBIZIONE_ON);
         line_rele_inib_ep_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_inib_ep\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_ep\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_INIBIZIONE_OFF\r\n");
         send_curl_request(ELETTROPOMPA,curl_EP_SET_INIBIZIONE_OFF);
         line_rele_inib_ep_status = false;
     }
 
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_stop_ep\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_stop_ep\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_STOP_ON\r\n");
         send_curl_request(ELETTROPOMPA,curl_EP_SET_STOP_ON);
         line_rele_stop_ep_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_stop_ep\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_stop_ep\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_STOP_OFF\r\n");
         send_curl_request(ELETTROPOMPA,curl_EP_SET_STOP_OFF);
         line_rele_stop_ep_status = false;
     }
 
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_reset_ep\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_reset_ep\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_STOP_ON\r\n");
         send_curl_request(ELETTROPOMPA,curl_EP_SET_RESET_ON);
         line_rele_reset_ep_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_reset_ep\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_reset_ep\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_STOP_OFF\r\n");
         send_curl_request(ELETTROPOMPA,curl_EP_SET_RESET_OFF);
@@ -350,56 +382,56 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
     }
 
     //*******************************************************************************************//
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_start_mp\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_mp\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_MP_SET_START_ON\r\n");
         send_curl_request(MOTOPOMPA,curl_MP_SET_START_ON);
         line_rele_start_mp_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_start_mp\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_mp\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_MP_SET_START_OFF\r\n");
         send_curl_request(MOTOPOMPA,curl_MP_SET_START_OFF);
         line_rele_start_mp_status = false;
     }
 
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_inib_mp\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_mp\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_MP_SET_INIBIZIONE_ON\r\n");
         send_curl_request(MOTOPOMPA,curl_MP_SET_INIBIZIONE_ON);
         line_rele_inib_mp_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_inib_mp\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_mp\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_MP_SET_INIBIZIONE_OFF\r\n");
         send_curl_request(MOTOPOMPA,curl_MP_SET_INIBIZIONE_OFF);
         line_rele_inib_mp_status = false;
     }
 
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_stop_mp\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_stop_mp\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_MP_SET_STOP_ONr\n");
         send_curl_request(MOTOPOMPA,curl_MP_SET_STOP_ON);
         line_rele_stop_mp_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_stop_mp\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_stop_mp\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_MP_SET_STOP_OFF\r\n");
         send_curl_request(MOTOPOMPA,curl_MP_SET_STOP_OFF);
         line_rele_stop_mp_status = false;
     }
 
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_reset_mp\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_reset_mp\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_STOP_ON\r\n");
         send_curl_request(MOTOPOMPA,curl_MP_SET_RESET_ON);
         line_rele_reset_mp_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_reset_mp\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_reset_mp\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_STOP_OFF\r\n");
         send_curl_request(MOTOPOMPA,curl_MP_SET_RESET_OFF);
@@ -408,14 +440,14 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
 
     //************************************************************************************************//
 
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_start_jk\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_jk\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_START_ON\r\n");
         send_curl_request(JOKEY,curl_JOKEY_SET_START_ON);
         line_rele_start_jk_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_start_jk\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_jk\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_START_OFF\r\n");
         send_curl_request(JOKEY,curl_JOKEY_SET_START_OFF);
@@ -423,14 +455,14 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
 
     }
 
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_inib_jk\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_jk\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_INIBIZIONE_ON\r\n");
         send_curl_request(JOKEY,curl_JOKEY_SET_INIBIZIONE_ON);
         line_rele_inib_jk_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_inib_jk\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_jk\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_INIBIZIONE_OFF\r\n");
         send_curl_request(JOKEY,curl_JOKEY_SET_INIBIZIONE_OFF);
@@ -439,14 +471,14 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
     //************************************************************************************************//
 
 
-    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_ev_spk\",\"v\":\"1\"}") == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_ev_spk\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_START_ON\r\n");
         send_curl_request(JOKEY,curl_SPRINKLER_SET_EV_ON);
         line_rele_start_sp_status = true;
     }
 
-    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev3_ev_spk\",\"v\":\"0\"}") == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_ev_spk\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_START_OFF\r\n");
         send_curl_request(JOKEY,curl_SPRINKLER_SET_EV_OFF);
@@ -464,6 +496,8 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
 
 void connlost(void *context, char *cause)
 {
+
+
     //MQTTAsync client = (MQTTAsync)context;
     //MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
     int rc;
@@ -473,9 +507,7 @@ void connlost(void *context, char *cause)
     //conn_opts.keepAliveInterval = 20;
     conn_opts.cleansession = 1;
 
-
     RS256Validator signer(rsa_publ_key,rsa_priv_key);
-
 
     struct timeval tp;
     gettimeofday(&tp, NULL);
@@ -562,6 +594,17 @@ size_t writeFunction(void* ptr, size_t size, size_t nmemb, std::string* data) {
 int main(int argc, char* argv[])
 {
 
+    pLogger = Logger::getInstance();
+    // Log message C++ Interface
+
+    //    pLogger->error("Message Logged using C++ Interface, Log level: LOG_ERROR");
+    //    pLogger->alarm("Message Logged using C++ Interface, Log level: LOG_ALARM");
+    //    pLogger->always("Message Logged using C++ Interface, Log level: LOG_ALWAYS");
+    //    pLogger->buffer("Message Logged using C++ Interface, Log level: LOG_INFO");
+    //    pLogger->info("Message Logged using C++ Interface, Log level: LOG_BUFFER");
+    //    pLogger->trace("Message Logged using C++ Interface, Log level: LOG_TRACE");
+    //    pLogger->debug("Message Logged using C++ Interface, Log level: LOG_DEBUG");
+
     //    gpio_write(PORT_RELE1, OFFSET_RELE1, 1);
     //    gpio_write(PORT_RELE3, OFFSET_RELE3, 1);
     //    gpio_write(PORT_RELE4, OFFSET_RELE4, 1);
@@ -569,6 +612,12 @@ int main(int argc, char* argv[])
     gpio_write(PORT_RELE1, OFFSET_RELE1, 0);
     gpio_write(PORT_RELE3, OFFSET_RELE3, 0);
     gpio_write(PORT_RELE4, OFFSET_RELE4, 0);
+
+
+
+
+
+
 
     RS256Validator signer(rsa_publ_key,rsa_priv_key);
 
@@ -614,6 +663,10 @@ int main(int argc, char* argv[])
     if ((rc = MQTTAsync_connect(client, &conn_opts)) != MQTTASYNC_SUCCESS)
     {
         printf("Failed to start connect, return code %d\r\n", rc);
+        std::ostringstream ss;
+        ss << endl;
+        ss << "\t" << "Failed to start connect, return code %d" << rc << endl;
+        pLogger->info(ss);
         exit(EXIT_FAILURE);
     }
 
@@ -967,12 +1020,14 @@ int main(int argc, char* argv[])
                response_string_SPRINKLER.c_str()); // @suppress("Method cannot be resolved")
 
 
-        read_ADvalue_row_ch0("in_voltage6_raw",&ad_value6_ch0);
-        read_ADvalue_row_ch0("in_voltage13_raw",&ad_value13_ch0);
-        read_ADvalue_row_ch1("in_voltage2_raw",&ad_value2_ch1);
-        read_ADvalue_row_ch1("in_voltage6_raw",&ad_value6_ch1);
+
+        read_ADvalue_row_ch0((char*)"in_voltage6_raw",&ad_value6_ch0);
+        read_ADvalue_row_ch0((char*)"in_voltage13_raw",&ad_value13_ch0);
+        read_ADvalue_row_ch1((char*)"in_voltage2_raw",&ad_value2_ch1);
+        read_ADvalue_row_ch1((char*)"in_voltage6_raw",&ad_value6_ch1);
 
         printf("\r\n ANALOG CHANNEL [%d][%d][%d][%d]\r\n",ad_value6_ch0,ad_value13_ch0,ad_value2_ch1,ad_value6_ch1);
+
 
         //****************************************************************************************************//
 
@@ -982,7 +1037,7 @@ int main(int argc, char* argv[])
 
         json payload_msg;
         payload_msg["rt"] = true;
-        payload_msg["u"] = "testdev3";
+        payload_msg["u"] = "testdev4";
         payload_msg["ts"] = JGuardian_param_istance.tp.tv_sec;
         payload_msg["t"] = 30;
         payload_msg["m"] = {
@@ -1131,28 +1186,6 @@ int main(int argc, char* argv[])
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     int payload_size = strlen(payload_msg.dump().c_str());
     memset(message_to_send,0,4000);
     memcpy(message_to_send,payload_msg.dump().c_str(),payload_size);
@@ -1176,6 +1209,11 @@ int main(int argc, char* argv[])
         if ((rc = MQTTAsync_sendMessage(client, TOPIC_RT, &pubmsg, &opts)) != MQTTASYNC_SUCCESS)
         {
             printf("Failed to start sendMessage, return code %d\n", rc);
+            std::ostringstream ss;
+            ss << endl;
+            ss << "\t" << "Failed to start sendMessage, return code %d" << rc << endl;
+            pLogger->error(ss);
+
         }
     }
 
