@@ -217,7 +217,6 @@ bool line_rele_start_jk_status = false;
 bool line_rele_inib_jk_status = false;
 
 bool line_rele_start_sp_status = false;
-bool line_rele_inib_sp_status = false;
 
 
 
@@ -283,6 +282,24 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
     //int command;
     //int ret = 0;
     //scanf(messagePayload,"{\"c\":\"%d\"}",&command);
+
+
+    //  START SETTIMANNALE ////
+    if(strcmp(messagePayload,"{\"c\":\"start\"}") == 0 )
+    {
+
+        gpio_write(PORT_RELE4, OFFSET_RELE4, 1);
+
+    }
+
+    //  stop SETTIMANNALE ////
+
+    if(strcmp(messagePayload,"{\"c\":\"stop\"}") == 0 )
+    {
+
+        gpio_write(PORT_RELE4, OFFSET_RELE4, 0);
+
+    }
 
 
     //********************************************************************************************************//
@@ -612,12 +629,6 @@ int main(int argc, char* argv[])
     gpio_write(PORT_RELE1, OFFSET_RELE1, 0);
     gpio_write(PORT_RELE3, OFFSET_RELE3, 0);
     gpio_write(PORT_RELE4, OFFSET_RELE4, 0);
-
-
-
-
-
-
 
     RS256Validator signer(rsa_publ_key,rsa_priv_key);
 
@@ -1089,8 +1100,6 @@ int main(int argc, char* argv[])
         {{"m", "_1_3_8"}, {"v", motopompa_reg3[8]}},
         {{"m", "_1_3_9"}, {"v", motopompa_reg3[9]}},
 
-
-
         {{"m", "_1_3_10"}, {"v", motopompa_reg3[10]}},
         {{"m", "_1_3_11"}, {"v", motopompa_reg3[11]}},
         {{"m", "_1_3_12"}, {"v", motopompa_reg3[12]}},
@@ -1115,7 +1124,6 @@ int main(int argc, char* argv[])
         {{"m", "_1_11"}, {"v", motopompa_reg11}},
 
         {{"m", "_1_12"}, {"v", motopompa_reg12}},
-
 
         {{"m", "_1_13"}, {"v", motopompa_reg13}},
 
@@ -1171,19 +1179,27 @@ int main(int argc, char* argv[])
 
         {{"m", "_2_5_2"}, {"v", elettropompa_reg5_2}},
 
-
-
-
         //************************* STATO RELE ********************//
 
+        {{"m", "testdev4_rele_camera"}, {"v", line_rele_camera_status}},
+        {{"m", "testdev4_rele_luci"}, {"v", line_rele_luci_status}},
 
+        {{"m", "testdev4_start_ep"}, {"v", line_rele_start_ep_status}},
+        {{"m", "testdev4_inib_ep"}, {"v", line_rele_inib_ep_status}},
+        {{"m", "testdev4_stop_ep"}, {"v", line_rele_stop_ep_status}},
+        {{"m", "testdev4_reset_ep"}, {"v", line_rele_reset_ep_status}},
 
+        {{"m", "testdev4_start_mp"}, {"v", line_rele_start_mp_status}},
+        {{"m", "testdev4_inib_mp"}, {"v", line_rele_inib_mp_status}},
+        {{"m", "testdev4_stop_mp"}, {"v", line_rele_stop_mp_status}},
+        {{"m", "testdev4_reset_mp"}, {"v", line_rele_reset_mp_status}},
 
+        {{"m", "testdev4_start_jk"}, {"v", line_rele_start_jk_status}},
+        {{"m", "testdev4_inib_jk"}, {"v", line_rele_inib_jk_status}},
+
+        {{"m", "testdev4_ev_spk"}, {"v", line_rele_start_sp_status}},
 
     };
-
-
-
 
 
     int payload_size = strlen(payload_msg.dump().c_str());

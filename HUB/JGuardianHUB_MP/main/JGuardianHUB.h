@@ -17,7 +17,6 @@
 #include "utility.h"
 #include "esp_mac.h"
 
-
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -31,7 +30,6 @@
 #include "driver/gpio.h"
 
 static const char *TAG = "JGUARDIAN_HUB_MP";
-
 
 //************************* RELE ******************************//
 #define GPIO_OUTPUT_IO_LED    21
