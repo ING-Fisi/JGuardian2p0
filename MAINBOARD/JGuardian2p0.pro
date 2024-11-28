@@ -6,12 +6,18 @@ DEFINES += LINUX
 
 CONFIG += c++14
 
+//**************************************
 
+DEFINES += DEV3
+
+
+///***********************************
 
 SOURCES += \
     Analog.cpp \
     JGuardian.cpp \
     Logger.cpp \
+    command.cpp \
     gpio.cpp
 
 
@@ -42,6 +48,7 @@ HEADERS += \
     Analog.h \
     JGuardian.h \
     Logger.h \
+    command.h \
     gpio.h
 
 
