@@ -84,7 +84,7 @@ void app_main(void) {
   // zero-initialize the config structure.
   gpio_config_t io_conf_0 = {};
   io_conf_0.intr_type = GPIO_INTR_DISABLE;
-  io_conf_0.mode = GPIO_MODE_OUTPUT;
+  io_conf_0.mode = GPIO_MODE_INPUT_OUTPUT;
   io_conf_0.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_0;
   io_conf_0.pull_down_en = 0;
   io_conf_0.pull_up_en = 0;
@@ -93,7 +93,7 @@ void app_main(void) {
   // zero-initialize the config structure.
   gpio_config_t io_conf_1 = {};
   io_conf_1.intr_type = GPIO_INTR_DISABLE;
-  io_conf_1.mode = GPIO_MODE_OUTPUT;
+  io_conf_1.mode = GPIO_MODE_INPUT_OUTPUT;
   io_conf_1.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_1;
   io_conf_1.pull_down_en = 0;
   io_conf_1.pull_up_en = 0;
@@ -102,11 +102,20 @@ void app_main(void) {
   // zero-initialize the config structure.
   gpio_config_t io_conf_2 = {};
   io_conf_2.intr_type = GPIO_INTR_DISABLE;
-  io_conf_2.mode = GPIO_MODE_OUTPUT;
+  io_conf_2.mode = GPIO_MODE_INPUT_OUTPUT;
   io_conf_2.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_2;
   io_conf_2.pull_down_en = 0;
   io_conf_2.pull_up_en = 0;
   gpio_config(&io_conf_2);
+  
+    // zero-initialize the config structure.
+  gpio_config_t io_conf_3 = {};
+  io_conf_2.intr_type = GPIO_INTR_DISABLE;
+  io_conf_2.mode = GPIO_MODE_INPUT_OUTPUT;
+  io_conf_2.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_3;
+  io_conf_2.pull_down_en = 0;
+  io_conf_2.pull_up_en = 0;
+  gpio_config(&io_conf_3);
 
   //		//zero-initialize the config structure.
   //	gpio_config_t io_conf_3 = {};
@@ -162,7 +171,7 @@ void app_main(void) {
   gpio_set_level(GPIO_OUTPUT_IO_1, false);
   gpio_set_level(GPIO_OUTPUT_IO_2, false);
   gpio_set_level(GPIO_OUTPUT_IO_3, false);
-  gpio_set_level(GPIO_OUTPUT_IO_3, false);
+  gpio_set_level(GPIO_OUTPUT_IO_4, false);
   gpio_set_level(GPIO_OUTPUT_IO_LED, true);
 
   //*********************************************************/

@@ -80,28 +80,6 @@
 
 //************************************************************************************************//
 
-#define CURL_GETURI_MP "http://10.100.0.66/get_modbus"
-#define CURL_SETURI_MP "http://10.100.0.66/set_rele"
-
-#define CURL_GETURI_EP "http://10.100.0.77/get_modbus"
-#define CURL_SETURI_EP "http://10.100.0.77/set_rele"
-
-#define CURL_GETURI_JK "http://10.100.0.88/get_status"
-#define CURL_SETURI_JK "http://10.100.0.88/set_rele"
-
-#define CURL_GETURI_SP "http://10.100.0.99/get_status"
-#define CURL_SETURI_SP "http://10.100.0.99/set_rele"
-
-#define SET_RELE1_ON "RELE[1][1]"
-#define SET_RELE1_OFF "RELE[1][0]"
-#define SET_RELE2_ON "RELE[2][1]"
-#define SET_RELE2_OFF "RELE[2][0]"
-#define SET_RELE3_ON "RELE[3][1]"
-#define SET_RELE3_OFF "RELE[3][0]"
-#define SET_RELE4_ON "RELE[4][1]"
-#define SET_RELE4_OFF "RELE[4][0]"
-
-
 #endif
 
 #ifdef DEV4
@@ -170,18 +148,21 @@
 #define LIVELLO_PRESSIONE1 "testdev4_pressione2"
 #define LIVELLO_PRESSIONE2 "testdev4_livello"
 
+#endif
 //************************************************************************************************//
 
-#define CURL_GETURI_MP "http://10.100.0.66/get_modbus"
+#define CURL_GETURI_MODBUS_MP "http://10.100.0.66/get_modbus"
+#define CURL_GETURI_RELE_MP "http://10.100.0.66/get_rele_status"
 #define CURL_SETURI_MP "http://10.100.0.66/set_rele"
 
-#define CURL_GETURI_EP "http://10.100.0.77/get_modbus"
+#define CURL_GETURI_MODBUS_EP "http://10.100.0.77/get_modbus"
+#define CURL_GETURI_RELE_EP "http://10.100.0.77/get_rele_status"
 #define CURL_SETURI_EP "http://10.100.0.77/set_rele"
 
-#define CURL_GETURI_JK "http://10.100.0.88/get_status"
+#define CURL_GETURI_RELE_JK "http://10.100.0.88/get_rele_status"
 #define CURL_SETURI_JK "http://10.100.0.88/set_rele"
 
-#define CURL_GETURI_SP "http://10.100.0.99/get_status"
+#define CURL_GETURI_RELE_SP "http://10.100.0.99/get_rele_status"
 #define CURL_SETURI_SP "http://10.100.0.99/set_rele"
 
 #define SET_RELE1_ON "RELE[1][1]"
@@ -193,7 +174,7 @@
 #define SET_RELE4_ON "RELE[4][1]"
 #define SET_RELE4_OFF "RELE[4][0]"
 
-#endif
+
 
 
 
