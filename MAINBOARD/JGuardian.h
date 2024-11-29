@@ -9,6 +9,7 @@
 #include "MQTTAsync.h"
 #include <iostream>
 #include <curl/curl.h>
+//#include <string>
 
 #include <stdbool.h>
 #include <vector>
@@ -17,12 +18,12 @@
 #include <errno.h>
 #include <getopt.h>
 #include <inttypes.h>
+//#include <iio/iio.h>
+//#include <iio/iio-debug.h>
 #include <sys/time.h>
 #include "gpio.h"
+//#include <gpiod.hpp>
 #include "Logger.h"
-
-
-#ifdef DE3
 
 std::string rsa_priv_key = R"(-----BEGIN PRIVATE KEY-----
 MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDCFUi+GMO5Ij1J
@@ -63,50 +64,10 @@ R2FrosoiM94XRQrbsiMGXdyN+AqC1SOxKv+cdAh1kpL9S/Ep5GUmrhrflUP9Ut8m
 GQIDAQAB
 -----END PUBLIC KEY-----)";
 
-#endif
-
-#ifdef DEV4
-
-std::string rsa_priv_key = R"(-----BEGIN PRIVATE KEY-----
-MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC46OglMnP3nDvh
-/13d0nlDS8kMIbFAE44RsrMcEcXmOHWMaFNmw8IoiP+sQ7Z6M/fin0U7MdJ13je4
-JzVOKMrO+kvkakvWzt0cJvGikO8yA82a5vWAi3at/t4+9Tzb5b8su1kj+6Au7WFi
-pO8LjODUjLZhjifz7IiGxImxhxfq9CRg9AK1Gq+KH/yUoBUqatHELjg5ZUF/9jmB
-pfgFST9dXSlaXmwgtW75IYiukdIfDj0Ilg+aUwJLWUdLGr0qzrKrp8w78XCehctr
-C1Al1/OK/3HsHb5pvcFvG+WnSL3qVSmlbjNCtDr785JXedokxGRa72V/GjnRYEYg
-SzFWeo5rAgMBAAECggEAANgaQLmiMCPMx6JLPx2aQ3acMaYjukXvVum5QzljIjFS
-7fyzUZljA19t+vbHI11NZ+dLYBUQirZ8zi8WrG8aYNFYoxu+tQ+z+mZjmM4jGSMP
-wY8FXYU6cAIeomoVRCoBf5O6e2Y1oFxAnsCdWiOT8BR4lDJdrw0rGB2VIcFCoUvM
-ryle4dEbhM4ArHlMkhAHakV5LsfN0bsL9UUOWXDz1qngAaoyI5pgxG4L0JvocSNY
-XG/EV1/HBzAebDWdMf/bX3WzH5L+HOTrWqIMQjAIkHSH/jpsjMob25OG3/W4wUG+
-81G7fSPqPkCdSZDd6Uf1bqPOC7Xx0BFdsbU5XiRWWQKBgQD6TKlHuTFhTmWLvIi4
-Z+LMyHmtv5KJx9VI3FejAN4Z7CC1acojkfOaJgnDIaz3b9lr5iJnDJ5H6zg+lGsm
-4BQmZ/2/7+FYTL6QPk9UJhvSObSpf97/ZZhr/UE2JANfxxI3bSeVS58k6KBjdn3P
-497UrQhbxMnktojgeKcqFmIXOQKBgQC9Hv/iFHuwDvc1xAlPO25tndABS+jz7I5B
-vCU/bASN2YQMedceI6d578Tf4jGoB3nBjQhCLuxAZuhRvOUOz6m4pi2klrqx7kKG
-z2uSpEU3TvfQnBlvZC51Jtkayh5L4LZaxiRCqux723JDGQezBzjzneocJ7JyKBk0
-fs1QmKvOwwKBgQDSBad5LlTX8F9WjEEwcsMk0AcBmqDMCajWtUS32s+CctbTQkxB
-4oLEUqyYVlZ7XRfT6MvvKfBaKm4MXJ84hIeD3nhWKGMuo163TAFme3+Wu6LzIv+r
-z8TAwEWKt1c5c6G+blHrfQOxhZynONLCsNLWI8bCsfIyflOF/tdNgnCWSQKBgQCa
-4FYhKTEZv0fH6iDNmBgZANIlHatKhwEA6DmAtM8N84HmTalTb1Np0mdiCXUs6+JU
-FVEcEh07qIq81XqoJHwTUVOzpBSEPmCQ0jCASLK+VpcvaYaS6HH7UrMc80TYUtBD
-ilyLlDpSPCZYuJjLjjCfoUTlhcTnI9twWB9/z2dzzQKBgQCKu3YIfWMpHjT1GMt/
-uDq7AgwkJzsiTwGdgP4fjnCRx5O5wfeSMKWKzz6Sn1z/zQXyBNgB5cy2XrzuGytx
-Y5uyzoVhW3z6ZsH9AsNVLPgIz2GSf8/SzPQ52B/g2e0rs8AvYLWaoMJYjfs6iT/W
-yWJpFXChbahSjLsfzE8VtJiQkA==
------END PRIVATE KEY-----)";
-
-std::string rsa_publ_key = R"(-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuOjoJTJz95w74f9d3dJ5
-Q0vJDCGxQBOOEbKzHBHF5jh1jGhTZsPCKIj/rEO2ejP34p9FOzHSdd43uCc1TijK
-zvpL5GpL1s7dHCbxopDvMgPNmub1gIt2rf7ePvU82+W/LLtZI/ugLu1hYqTvC4zg
-1Iy2YY4n8+yIhsSJsYcX6vQkYPQCtRqvih/8lKAVKmrRxC44OWVBf/Y5gaX4BUk/
-XV0pWl5sILVu+SGIrpHSHw49CJYPmlMCS1lHSxq9Ks6yq6fMO/FwnoXLawtQJdfz
-iv9x7B2+ab3Bbxvlp0i96lUppW4zQrQ6+/OSV3naJMRkWu9lfxo50WBGIEsxVnqO
-awIDAQAB
------END PUBLIC KEY-----)";
 
 
-#endif
+
+
+
 
 #endif // JGUARDIAN_H

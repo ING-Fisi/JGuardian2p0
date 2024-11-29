@@ -1,6 +1,5 @@
 //******************************************************************************************************************//
 #include "JGuardian.h"
-#include "command.h"
 
 using namespace std;
 using namespace CPlusPlusLogging;
@@ -27,6 +26,13 @@ typedef struct JGuardian_param
 
 
 JGuardian_param JGuardian_param_istance;
+//{
+//    .RealTime_data = true,
+//    .id_dev = "testdev",
+//    //		.m.id_dev "testdev_1",
+//    //				.payload = "Hello world"
+//    //		}
+//};
 
 std::vector<std::string> split(const std::string& s, char seperator)
 {
@@ -51,26 +57,19 @@ std::vector<std::string> split(const std::string& s, char seperator)
 
 typedef enum machine_type
 {
-    MOTOPOMPA_MB,
-    MOTOPOMPA_RELE,
-    ELETTROPOMPA_MB,
-    ELETTROPOMPA_RELE,
+    MOTOPOMPA,
+    ELETTROPOMPA,
     JOKEY,
     SPRINKLER
 
 }machine_type;
 
-std::string response_string_modbus_MP;
-std::string response_string_rele_MP;
-
-std::string response_string_modbus_EP;
-std::string response_string_rele_EP;
-
+std::string response_string_MP;
+std::string response_string_EP;
 std::string response_string_JOKEY;
 std::string response_string_SPRINKLER;
 
 CURL* curl_MP_GET_MODBUS;
-CURL* curl_MP_GET_RELE_STATUS;
 CURL* curl_MP_SET_START_ON;
 CURL* curl_MP_SET_START_OFF;
 CURL* curl_MP_SET_INIBIZIONE_ON;
@@ -81,7 +80,6 @@ CURL* curl_MP_SET_RESET_ON;
 CURL* curl_MP_SET_RESET_OFF;
 
 CURL* curl_EP_GET_MODBUS;
-CURL* curl_EP_GET_RELE_STATUS;
 CURL* curl_EP_SET_START_ON;
 CURL* curl_EP_SET_START_OFF;
 CURL* curl_EP_SET_INIBIZIONE_ON;
@@ -91,13 +89,13 @@ CURL* curl_EP_SET_STOP_OFF;
 CURL* curl_EP_SET_RESET_ON;
 CURL* curl_EP_SET_RESET_OFF;
 
-CURL* curl_JOKEY_GET_RELE_STATUS;
+CURL* curl_JOKEY_GET_STATUS;
 CURL* curl_JOKEY_SET_START_ON;
 CURL* curl_JOKEY_SET_START_OFF;
 CURL* curl_JOKEY_SET_INIBIZIONE_ON;
 CURL* curl_JOKEY_SET_INIBIZIONE_OFF;
 
-CURL* curl_SPRINKLER_GET_RELE_STATUS;
+CURL* curl_SPRINKLER_GET_STATUS;
 CURL* curl_SPRINKLER_SET_EV_ON;
 CURL* curl_SPRINKLER_SET_EV_OFF;
 
@@ -106,10 +104,10 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
 {
     switch(mt)
     {
-    case MOTOPOMPA_MB:
+    case MOTOPOMPA:
 
         if (curl_req) {
-            response_string_modbus_MP.clear();
+            response_string_MP.clear();
             CURLcode res = curl_easy_perform(curl_req);
             /* Check for errors */
             if(res != CURLE_OK)
@@ -125,47 +123,10 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
         }
 
         break;
-    case MOTOPOMPA_RELE:
+    case ELETTROPOMPA:
 
         if (curl_req) {
-            response_string_rele_MP.clear();
-            CURLcode res = curl_easy_perform(curl_req);
-            /* Check for errors */
-            if(res != CURLE_OK)
-            {
-                printf("curl_easy_perform() MOTOPOMPA failed: %s\r\n",curl_easy_strerror(res));
-                std::ostringstream ss;
-                ss << endl;
-                ss << "\t" << "curl_easy_perform() MOTOPOMPA failed " << curl_easy_strerror(res)<< endl;
-                pLogger->info(ss);
-            }
-
-            return true;
-        }
-
-        break;
-    case ELETTROPOMPA_MB:
-
-        if (curl_req) {
-            response_string_modbus_EP.clear();
-            CURLcode res = curl_easy_perform(curl_req);
-            /* Check for errors */
-            if(res != CURLE_OK)
-            {
-                printf("curl_easy_perform() ELETTROPOMPA failed: %s\r\n",curl_easy_strerror(res));
-                std::ostringstream ss;
-                ss << endl;
-                ss << "\t" << "curl_easy_perform() ELETTROPOMPA failed " << curl_easy_strerror(res)<< endl;
-                pLogger->info(ss);
-            }
-            return true;
-        }
-
-        break;
-    case ELETTROPOMPA_RELE:
-
-        if (curl_req) {
-            response_string_rele_EP.clear();
+            response_string_EP.clear();
             CURLcode res = curl_easy_perform(curl_req);
             /* Check for errors */
             if(res != CURLE_OK)
@@ -221,6 +182,9 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
 
     }
 
+
+
+
     return false;
 }
 
@@ -237,6 +201,7 @@ struct gpiod_line *line_rele1;
 
 bool line_rele_camera_status = false;
 bool line_rele_luci_status = false;
+
 
 bool line_rele_start_ep_status = false;
 bool line_rele_inib_ep_status = false;
@@ -268,6 +233,7 @@ bool line_rele_start_sp_status = false;
 #define OFFSET_RELE4 11
 
 
+
 //*************************** ADC *********************************//
 #include "Analog.h"
 
@@ -280,13 +246,20 @@ int ad_value6_ch1=0;
 MQTTAsync client;
 MQTTAsync_connectOptions conn_opts;
 
+
 #include "jwt/jwt_all.h"
 using json = nlohmann::json;
+
+#define ADDRESS_RT  "mqtt://mqtt.datasmart.cloud:1883"
+#define CLIENTID    "projects/jguardian/locations/europe-west1/registries/j-guardian-v1/devices/Device-testdev4"
+#define TOPIC_RT    "/application/jguardian/devices/Device-testdev4/events"
+#define TOPIC_SUB   "/application/jguardian/devices/Device-testdev4/commands/#"
+#define QOS         1
+#define TIMEOUT    200000L
+
+
 volatile MQTTAsync_token deliveredtoken;
-
 int finished = 0;
-
-bool start_remote_test = false;
 
 int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_message *message) {
     printf("Message arrived\n");
@@ -312,23 +285,25 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
 
 
     //  START SETTIMANNALE ////
-    if(strcmp(messagePayload,REMOTE_START) == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"start\"}") == 0 )
     {
+
         gpio_write(PORT_RELE4, OFFSET_RELE4, 1);
-        start_remote_test = true;
+
     }
 
     //  stop SETTIMANNALE ////
 
-    if(strcmp(messagePayload,REMOTE_STOP) == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"stop\"}") == 0 )
     {
+
         gpio_write(PORT_RELE4, OFFSET_RELE4, 0);
-        start_remote_test = false;
+
     }
 
 
     //********************************************************************************************************//
-    if(strcmp(messagePayload,REMOTE_RELE_CAMERA_ON) == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_rele_camera\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO ATTIVAZIONE RELE CAMERA\r\n");
 
@@ -338,7 +313,7 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
 
     }
 
-    else if(strcmp(messagePayload,REMOTE_RELE_CAMERA_OFF) == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_rele_camera\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO DISATTIVAZIONE RELE CAMERA\r\n");
 
@@ -348,7 +323,7 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
     }
 
     //************************************************************************************************//
-    if(strcmp(messagePayload,REMOTE_RELE_LUCI_ON) == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_rele_luci\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO ATTIVAZIONE RELE LUCI\r\n");
 
@@ -357,7 +332,7 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
         line_rele_luci_status = true;
     }
 
-    else if(strcmp(messagePayload,REMOTE_RELE_LUCI_OFF) == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_rele_luci\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO DISATTIVAZIONE RELE LUCI\r\n");
 
@@ -367,158 +342,164 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
     }
 
     //**************************************************************************************************//
-    if(strcmp(messagePayload,REMOTE_START_EP) == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_ep\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_START_ON\r\n");
-        send_curl_request(ELETTROPOMPA_RELE,curl_EP_SET_START_ON);
-        //line_rele_start_ep_status = true;
-
-        sleep(1);
-
-        printf("COMANDO curl_EP_SET_START_OFFr\n");
-        send_curl_request(ELETTROPOMPA_RELE,curl_EP_SET_START_OFF);
-        //line_rele_start_ep_status = false;
+        send_curl_request(ELETTROPOMPA,curl_EP_SET_START_ON);
+        line_rele_start_ep_status = true;
     }
 
-    if(strcmp(messagePayload,REMOTE_INIB_EP_ON) == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_ep\",\"v\":\"0\"}") == 0 )
+    {
+        printf("COMANDO curl_EP_SET_START_OFFr\n");
+        send_curl_request(ELETTROPOMPA,curl_EP_SET_START_OFF);
+        line_rele_start_ep_status = false;
+    }
+
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_ep\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_INIBIZIONE_ON\r\n");
-        send_curl_request(ELETTROPOMPA_RELE,curl_EP_SET_INIBIZIONE_ON);
-        //line_rele_inib_ep_status = true;
+        send_curl_request(ELETTROPOMPA,curl_EP_SET_INIBIZIONE_ON);
+        line_rele_inib_ep_status = true;
     }
 
-    else if(strcmp(messagePayload,REMOTE_INIB_EP_OFF) == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_ep\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_INIBIZIONE_OFF\r\n");
-        send_curl_request(ELETTROPOMPA_RELE,curl_EP_SET_INIBIZIONE_OFF);
-        //line_rele_inib_ep_status = false;
+        send_curl_request(ELETTROPOMPA,curl_EP_SET_INIBIZIONE_OFF);
+        line_rele_inib_ep_status = false;
     }
 
-    if(strcmp(messagePayload,REMOTE_STOP_EP) == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_stop_ep\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_STOP_ON\r\n");
-        send_curl_request(ELETTROPOMPA_RELE,curl_EP_SET_STOP_ON);
-        //line_rele_stop_ep_status = true;
-
-        sleep(1);
-
-        printf("COMANDO curl_EP_SET_STOP_OFF\r\n");
-        send_curl_request(ELETTROPOMPA_RELE,curl_EP_SET_STOP_OFF);
-        //line_rele_stop_ep_status = false;
+        send_curl_request(ELETTROPOMPA,curl_EP_SET_STOP_ON);
+        line_rele_stop_ep_status = true;
     }
 
-    if(strcmp(messagePayload,REMOTE_RESET_EP) == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_stop_ep\",\"v\":\"0\"}") == 0 )
+    {
+        printf("COMANDO curl_EP_SET_STOP_OFF\r\n");
+        send_curl_request(ELETTROPOMPA,curl_EP_SET_STOP_OFF);
+        line_rele_stop_ep_status = false;
+    }
+
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_reset_ep\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_STOP_ON\r\n");
-        send_curl_request(ELETTROPOMPA_RELE,curl_EP_SET_RESET_ON);
-        //line_rele_reset_ep_status = true;
+        send_curl_request(ELETTROPOMPA,curl_EP_SET_RESET_ON);
+        line_rele_reset_ep_status = true;
+    }
 
-        sleep(1);
-
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_reset_ep\",\"v\":\"0\"}") == 0 )
+    {
         printf("COMANDO curl_EP_SET_STOP_OFF\r\n");
-        send_curl_request(ELETTROPOMPA_RELE,curl_EP_SET_RESET_OFF);
-        //line_rele_reset_ep_status = false;
+        send_curl_request(ELETTROPOMPA,curl_EP_SET_RESET_OFF);
+        line_rele_reset_ep_status = false;
     }
 
     //*******************************************************************************************//
-    if(strcmp(messagePayload,REMOTE_START_MP) == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_mp\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_MP_SET_START_ON\r\n");
-        send_curl_request(MOTOPOMPA_RELE,curl_MP_SET_START_ON);
-        //line_rele_start_mp_status = true;
-
-        sleep(1);
-
-        printf("COMANDO curl_MP_SET_START_OFF\r\n");
-        send_curl_request(MOTOPOMPA_RELE,curl_MP_SET_START_OFF);
-        //line_rele_start_mp_status = false;
+        send_curl_request(MOTOPOMPA,curl_MP_SET_START_ON);
+        line_rele_start_mp_status = true;
     }
 
-    if(strcmp(messagePayload,REMOTE_INIB_MP_ON) == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_mp\",\"v\":\"0\"}") == 0 )
+    {
+        printf("COMANDO curl_MP_SET_START_OFF\r\n");
+        send_curl_request(MOTOPOMPA,curl_MP_SET_START_OFF);
+        line_rele_start_mp_status = false;
+    }
+
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_mp\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_MP_SET_INIBIZIONE_ON\r\n");
-        send_curl_request(MOTOPOMPA_RELE,curl_MP_SET_INIBIZIONE_ON);
-        //line_rele_inib_mp_status = true;
+        send_curl_request(MOTOPOMPA,curl_MP_SET_INIBIZIONE_ON);
+        line_rele_inib_mp_status = true;
     }
 
-    else if(strcmp(messagePayload,REMOTE_INIB_MP_OFF) == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_mp\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_MP_SET_INIBIZIONE_OFF\r\n");
-        send_curl_request(MOTOPOMPA_RELE,curl_MP_SET_INIBIZIONE_OFF);
-        //line_rele_inib_mp_status = false;
+        send_curl_request(MOTOPOMPA,curl_MP_SET_INIBIZIONE_OFF);
+        line_rele_inib_mp_status = false;
     }
 
-    if(strcmp(messagePayload,REMOTE_STOP_MP) == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_stop_mp\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_MP_SET_STOP_ONr\n");
-        send_curl_request(MOTOPOMPA_RELE,curl_MP_SET_STOP_ON);
-        //line_rele_stop_mp_status = true;
-
-        sleep(1);
-
-        printf("COMANDO curl_MP_SET_STOP_OFF\r\n");
-        send_curl_request(MOTOPOMPA_RELE,curl_MP_SET_STOP_OFF);
-        //line_rele_stop_mp_status = false;
+        send_curl_request(MOTOPOMPA,curl_MP_SET_STOP_ON);
+        line_rele_stop_mp_status = true;
     }
 
-    if(strcmp(messagePayload,REMOTE_RESET_MP) == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_stop_mp\",\"v\":\"0\"}") == 0 )
+    {
+        printf("COMANDO curl_MP_SET_STOP_OFF\r\n");
+        send_curl_request(MOTOPOMPA,curl_MP_SET_STOP_OFF);
+        line_rele_stop_mp_status = false;
+    }
+
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_reset_mp\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_EP_SET_STOP_ON\r\n");
-        send_curl_request(MOTOPOMPA_RELE,curl_MP_SET_RESET_ON);
-        //line_rele_reset_mp_status = true;
+        send_curl_request(MOTOPOMPA,curl_MP_SET_RESET_ON);
+        line_rele_reset_mp_status = true;
+    }
 
-        sleep(1);
-
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_reset_mp\",\"v\":\"0\"}") == 0 )
+    {
         printf("COMANDO curl_EP_SET_STOP_OFF\r\n");
-        send_curl_request(MOTOPOMPA_RELE,curl_MP_SET_RESET_OFF);
-        //line_rele_reset_mp_status = false;
+        send_curl_request(MOTOPOMPA,curl_MP_SET_RESET_OFF);
+        line_rele_reset_mp_status = false;
     }
 
     //************************************************************************************************//
 
-    if(strcmp(messagePayload,REMOTE_START_JK) == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_jk\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_START_ON\r\n");
         send_curl_request(JOKEY,curl_JOKEY_SET_START_ON);
-        //line_rele_start_jk_status = true;
+        line_rele_start_jk_status = true;
     }
 
-    else if(strcmp(messagePayload,REMOTE_STOP_JK) == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_start_jk\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_START_OFF\r\n");
         send_curl_request(JOKEY,curl_JOKEY_SET_START_OFF);
-        //line_rele_start_jk_status = false;
+        line_rele_start_jk_status = false;
 
     }
 
-    if(strcmp(messagePayload,REMOTE_INIB_JK_ON) == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_jk\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_INIBIZIONE_ON\r\n");
         send_curl_request(JOKEY,curl_JOKEY_SET_INIBIZIONE_ON);
-        //line_rele_inib_jk_status = true;
+        line_rele_inib_jk_status = true;
     }
 
-    else if(strcmp(messagePayload,REMOTE_INIB_JK_OFF) == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_inib_jk\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_INIBIZIONE_OFF\r\n");
         send_curl_request(JOKEY,curl_JOKEY_SET_INIBIZIONE_OFF);
-        //line_rele_inib_jk_status = false;
+        line_rele_inib_jk_status = false;
     }
     //************************************************************************************************//
 
 
-    if(strcmp(messagePayload,REMOTE_START_SP) == 0 )
+    if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_ev_spk\",\"v\":\"1\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_START_ON\r\n");
         send_curl_request(JOKEY,curl_SPRINKLER_SET_EV_ON);
-        //line_rele_start_sp_status = true;
+        line_rele_start_sp_status = true;
     }
 
-    else if(strcmp(messagePayload,REMOTE_STOP_SP) == 0 )
+    else if(strcmp(messagePayload,"{\"c\":\"2\",\"m\":\"testdev4_ev_spk\",\"v\":\"0\"}") == 0 )
     {
         printf("COMANDO curl_JOKEY_SET_START_OFF\r\n");
         send_curl_request(JOKEY,curl_SPRINKLER_SET_EV_OFF);
-        //line_rele_start_sp_status = false;
+        line_rele_start_sp_status = false;
     }
 
 
@@ -530,9 +511,9 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
 }
 
 
-
 void connlost(void *context, char *cause)
 {
+
 
     //MQTTAsync client = (MQTTAsync)context;
     //MQTTAsync_connectOptions conn_opts = MQTTAsync_connectOptions_initializer;
@@ -572,7 +553,20 @@ void onDisconnect(void* context, MQTTAsync_successData* response)
 }
 void onSend(void* context, MQTTAsync_successData* response)
 {
+    //MQTTAsync client = (MQTTAsync)context;
+    //MQTTAsync_disconnectOptions opts = MQTTAsync_disconnectOptions_initializer;
+    //int rc;
     printf("CLIENT Message with token value %d delivery confirmed\n", response->token);
+
+
+
+    //	opts.onSuccess = onDisconnect;
+    //	opts.context = client;
+    //	if ((rc = MQTTAsync_disconnect(client, &opts)) != MQTTASYNC_SUCCESS)
+    //	{
+    //		printf("Failed to start sendMessage, return code %d\n", rc);
+    //		exit(EXIT_FAILURE);
+    //	}
 }
 void onConnectFailure(void* context, MQTTAsync_failureData* response)
 {
@@ -585,8 +579,12 @@ void onConnect(void* context, MQTTAsync_successData* response)
 {
     printf("Successful connection CLIENT\n");
 
+
+    //MQTTAsync client = (MQTTAsync)context;
     MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
     int rc;
+
+    printf("Successful connection\n");
 
     printf("Subscribing to topic %s\nfor client %s using QoS%d\n\n"
            "Press Q<Enter> to quit\n\n", TOPIC_SUB, CLIENTID, QOS);
@@ -602,6 +600,7 @@ void onConnect(void* context, MQTTAsync_successData* response)
 }
 
 //*********************************************************************************************//
+
 
 size_t writeFunction(void* ptr, size_t size, size_t nmemb, std::string* data) {
     data->append((char*)ptr, size * nmemb);
@@ -693,7 +692,7 @@ int main(int argc, char* argv[])
 
     curl_MP_GET_MODBUS = curl_easy_init();
     if (curl_MP_GET_MODBUS) {
-        curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_URL, CURL_GETURI_MODBUS_MP);
+        curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_URL, "http://192.168.0.66/get_modbus");
         curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_NOPROGRESS, 1L);
         curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_MAXREDIRS, 50L);
         curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_TCP_KEEPALIVE, 1L);
@@ -701,80 +700,66 @@ int main(int argc, char* argv[])
 
 
         curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_WRITEFUNCTION, writeFunction);
-        curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_WRITEDATA, &response_string_modbus_MP);
+        curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_WRITEDATA, &response_string_MP);
         curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_HEADERDATA, &header_string_MP);
-    }
-
-    curl_MP_GET_RELE_STATUS = curl_easy_init();
-    if (curl_MP_GET_RELE_STATUS) {
-        curl_easy_setopt(curl_MP_GET_RELE_STATUS, CURLOPT_URL, CURL_GETURI_RELE_MP);
-        curl_easy_setopt(curl_MP_GET_RELE_STATUS, CURLOPT_NOPROGRESS, 1L);
-        curl_easy_setopt(curl_MP_GET_RELE_STATUS, CURLOPT_MAXREDIRS, 50L);
-        curl_easy_setopt(curl_MP_GET_RELE_STATUS, CURLOPT_TCP_KEEPALIVE, 1L);
-        curl_easy_setopt(curl_MP_GET_RELE_STATUS, CURLOPT_TIMEOUT_MS, 1000);
-
-
-        curl_easy_setopt(curl_MP_GET_RELE_STATUS, CURLOPT_WRITEFUNCTION, writeFunction);
-        curl_easy_setopt(curl_MP_GET_RELE_STATUS, CURLOPT_WRITEDATA, &response_string_rele_MP);
-        curl_easy_setopt(curl_MP_GET_RELE_STATUS, CURLOPT_HEADERDATA, &header_string_MP);
     }
 
     curl_MP_SET_START_ON = curl_easy_init();
     if (curl_MP_SET_START_ON) {
-        curl_easy_setopt(curl_MP_SET_START_ON, CURLOPT_URL, CURL_SETURI_MP);
-        curl_easy_setopt(curl_MP_SET_START_ON, CURLOPT_POSTFIELDS, SET_RELE1_ON);
+        curl_easy_setopt(curl_MP_SET_START_ON, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_START_ON, CURLOPT_POSTFIELDS, "RELE[1][1]");
     }
 
     curl_MP_SET_START_OFF = curl_easy_init();
     if (curl_MP_SET_START_OFF) {
-        curl_easy_setopt(curl_MP_SET_START_OFF, CURLOPT_URL, CURL_SETURI_MP);
-        curl_easy_setopt(curl_MP_SET_START_OFF, CURLOPT_POSTFIELDS, SET_RELE1_OFF);
+        curl_easy_setopt(curl_MP_SET_START_OFF, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_START_OFF, CURLOPT_POSTFIELDS, "RELE[1][0]");
     }
 
     curl_MP_SET_INIBIZIONE_ON = curl_easy_init();
     if (curl_MP_SET_INIBIZIONE_ON) {
-        curl_easy_setopt(curl_MP_SET_INIBIZIONE_ON, CURLOPT_URL, CURL_SETURI_MP);
-        curl_easy_setopt(curl_MP_SET_INIBIZIONE_ON, CURLOPT_POSTFIELDS, SET_RELE2_ON);
+        curl_easy_setopt(curl_MP_SET_INIBIZIONE_ON, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_INIBIZIONE_ON, CURLOPT_POSTFIELDS, "RELE[2][1]");
     }
 
     curl_MP_SET_INIBIZIONE_OFF = curl_easy_init();
     if (curl_MP_SET_INIBIZIONE_OFF) {
-        curl_easy_setopt(curl_MP_SET_INIBIZIONE_OFF, CURLOPT_URL, CURL_SETURI_MP);
-        curl_easy_setopt(curl_MP_SET_INIBIZIONE_OFF, CURLOPT_POSTFIELDS, SET_RELE2_OFF);
+        curl_easy_setopt(curl_MP_SET_INIBIZIONE_OFF, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_INIBIZIONE_OFF, CURLOPT_POSTFIELDS, "RELE[2][0]");
     }
 
     curl_MP_SET_STOP_ON = curl_easy_init();
     if (curl_MP_SET_STOP_ON) {
-        curl_easy_setopt(curl_MP_SET_STOP_ON, CURLOPT_URL, CURL_SETURI_MP);
-        curl_easy_setopt(curl_MP_SET_STOP_ON, CURLOPT_POSTFIELDS, SET_RELE3_ON);
+        curl_easy_setopt(curl_MP_SET_STOP_ON, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_STOP_ON, CURLOPT_POSTFIELDS, "RELE[3][1]");
     }
 
     curl_MP_SET_STOP_OFF = curl_easy_init();
     if (curl_MP_SET_STOP_OFF) {
-        curl_easy_setopt(curl_MP_SET_STOP_OFF, CURLOPT_URL, CURL_SETURI_MP);
-        curl_easy_setopt(curl_MP_SET_STOP_OFF, CURLOPT_POSTFIELDS, SET_RELE3_OFF);
+        curl_easy_setopt(curl_MP_SET_STOP_OFF, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_STOP_OFF, CURLOPT_POSTFIELDS, "RELE[3][0]");
     }
 
     curl_MP_SET_RESET_ON = curl_easy_init();
     if (curl_MP_SET_RESET_ON) {
-        curl_easy_setopt(curl_MP_SET_RESET_ON, CURLOPT_URL, CURL_SETURI_MP);
-        curl_easy_setopt(curl_MP_SET_RESET_ON, CURLOPT_POSTFIELDS, SET_RELE4_ON);
+        curl_easy_setopt(curl_MP_SET_RESET_ON, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_RESET_ON, CURLOPT_POSTFIELDS, "RELE[4][1]");
     }
 
     curl_MP_SET_RESET_OFF = curl_easy_init();
     if (curl_MP_SET_RESET_OFF) {
-        curl_easy_setopt(curl_MP_SET_RESET_OFF, CURLOPT_URL, CURL_SETURI_MP);
-        curl_easy_setopt(curl_MP_SET_RESET_OFF, CURLOPT_POSTFIELDS, SET_RELE4_OFF);
+        curl_easy_setopt(curl_MP_SET_RESET_OFF, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_RESET_OFF, CURLOPT_POSTFIELDS, "RELE[4][0]");
     }
 
     //******************************ELETTROPOMPA************************//
 
 
-    std::string header_string_modbus_EP;
+    std::string header_string_EP;
 
     curl_EP_GET_MODBUS = curl_easy_init();
     if (curl_EP_GET_MODBUS) {
-        curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_URL, CURL_GETURI_MODBUS_EP);
+        curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_URL, "http://192.168.0.77/get_modbus");
         curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_NOPROGRESS, 1L);
         curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_MAXREDIRS, 50L);
         curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_TCP_KEEPALIVE, 1L);
@@ -782,72 +767,56 @@ int main(int argc, char* argv[])
 
 
         curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_WRITEFUNCTION, writeFunction);
-        curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_WRITEDATA, &response_string_modbus_EP);
-        curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_HEADERDATA, &header_string_modbus_EP);
-    }
-
-    std::string header_string_EP;
-
-    curl_EP_GET_RELE_STATUS = curl_easy_init();
-    if (curl_EP_GET_RELE_STATUS) {
-        curl_easy_setopt(curl_EP_GET_RELE_STATUS, CURLOPT_URL, CURL_GETURI_RELE_EP);
-        curl_easy_setopt(curl_EP_GET_RELE_STATUS, CURLOPT_NOPROGRESS, 1L);
-        curl_easy_setopt(curl_EP_GET_RELE_STATUS, CURLOPT_MAXREDIRS, 50L);
-        curl_easy_setopt(curl_EP_GET_RELE_STATUS, CURLOPT_TCP_KEEPALIVE, 1L);
-        curl_easy_setopt(curl_EP_GET_RELE_STATUS, CURLOPT_TIMEOUT_MS, 1000);
-
-
-        curl_easy_setopt(curl_EP_GET_RELE_STATUS, CURLOPT_WRITEFUNCTION, writeFunction);
-        curl_easy_setopt(curl_EP_GET_RELE_STATUS, CURLOPT_WRITEDATA, &response_string_rele_EP);
-        curl_easy_setopt(curl_EP_GET_RELE_STATUS, CURLOPT_HEADERDATA, &header_string_EP);
+        curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_WRITEDATA, &response_string_EP);
+        curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_HEADERDATA, &header_string_EP);
     }
 
     curl_EP_SET_START_ON = curl_easy_init();
     if (curl_EP_SET_START_ON) {
-        curl_easy_setopt(curl_EP_SET_START_ON, CURLOPT_URL, CURL_SETURI_EP);
-        curl_easy_setopt(curl_EP_SET_START_ON, CURLOPT_POSTFIELDS, SET_RELE1_ON);
+        curl_easy_setopt(curl_EP_SET_START_ON, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_START_ON, CURLOPT_POSTFIELDS, "RELE[1][1]");
     }
 
     curl_EP_SET_START_OFF = curl_easy_init();
     if (curl_EP_SET_START_OFF) {
-        curl_easy_setopt(curl_EP_SET_START_OFF, CURLOPT_URL, CURL_SETURI_EP);
-        curl_easy_setopt(curl_EP_SET_START_OFF, CURLOPT_POSTFIELDS, SET_RELE1_OFF);
+        curl_easy_setopt(curl_EP_SET_START_OFF, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_START_OFF, CURLOPT_POSTFIELDS, "RELE[1][0]");
     }
 
     curl_EP_SET_INIBIZIONE_ON = curl_easy_init();
     if (curl_EP_SET_INIBIZIONE_ON) {
-        curl_easy_setopt(curl_EP_SET_INIBIZIONE_ON, CURLOPT_URL, CURL_SETURI_EP);
-        curl_easy_setopt(curl_EP_SET_INIBIZIONE_ON, CURLOPT_POSTFIELDS, SET_RELE2_ON);
+        curl_easy_setopt(curl_EP_SET_INIBIZIONE_ON, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_INIBIZIONE_ON, CURLOPT_POSTFIELDS, "RELE[2][1]");
     }
 
     curl_EP_SET_INIBIZIONE_OFF = curl_easy_init();
     if (curl_EP_SET_INIBIZIONE_OFF) {
-        curl_easy_setopt(curl_EP_SET_INIBIZIONE_OFF, CURLOPT_URL, CURL_SETURI_EP);
-        curl_easy_setopt(curl_EP_SET_INIBIZIONE_OFF, CURLOPT_POSTFIELDS, SET_RELE2_OFF);
+        curl_easy_setopt(curl_EP_SET_INIBIZIONE_OFF, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_INIBIZIONE_OFF, CURLOPT_POSTFIELDS, "RELE[2][0]");
     }
 
     curl_EP_SET_STOP_ON = curl_easy_init();
     if (curl_EP_SET_STOP_ON) {
-        curl_easy_setopt(curl_EP_SET_STOP_ON, CURLOPT_URL, CURL_SETURI_EP);
-        curl_easy_setopt(curl_EP_SET_STOP_ON, CURLOPT_POSTFIELDS, SET_RELE3_ON);
+        curl_easy_setopt(curl_EP_SET_STOP_ON, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_STOP_ON, CURLOPT_POSTFIELDS, "RELE[3][1]");
     }
 
     curl_EP_SET_STOP_OFF = curl_easy_init();
     if (curl_EP_SET_STOP_OFF) {
-        curl_easy_setopt(curl_EP_SET_STOP_OFF, CURLOPT_URL, CURL_SETURI_EP);
-        curl_easy_setopt(curl_EP_SET_STOP_OFF, CURLOPT_POSTFIELDS, SET_RELE3_OFF);
+        curl_easy_setopt(curl_EP_SET_STOP_OFF, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_STOP_OFF, CURLOPT_POSTFIELDS, "RELE[3][0]");
     }
 
     curl_EP_SET_RESET_ON = curl_easy_init();
     if (curl_EP_SET_RESET_ON) {
-        curl_easy_setopt(curl_EP_SET_RESET_ON, CURLOPT_URL, CURL_SETURI_EP);
-        curl_easy_setopt(curl_EP_SET_RESET_ON, CURLOPT_POSTFIELDS, SET_RELE4_ON);
+        curl_easy_setopt(curl_EP_SET_RESET_ON, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_RESET_ON, CURLOPT_POSTFIELDS, "RELE[4][1]");
     }
 
     curl_EP_SET_RESET_OFF = curl_easy_init();
     if (curl_EP_SET_RESET_OFF) {
-        curl_easy_setopt(curl_EP_SET_RESET_OFF, CURLOPT_URL, CURL_SETURI_EP);
-        curl_easy_setopt(curl_EP_SET_RESET_OFF, CURLOPT_POSTFIELDS, SET_RELE4_OFF);
+        curl_easy_setopt(curl_EP_SET_RESET_OFF, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_RESET_OFF, CURLOPT_POSTFIELDS, "RELE[4][0]");
     }
 
 
@@ -855,72 +824,72 @@ int main(int argc, char* argv[])
 
     std::string header_string_JOKEY;
 
-    curl_JOKEY_GET_RELE_STATUS = curl_easy_init();
-    if (curl_JOKEY_GET_RELE_STATUS) {
-        curl_easy_setopt(curl_JOKEY_GET_RELE_STATUS, CURLOPT_URL, CURL_GETURI_RELE_JK);
-        curl_easy_setopt(curl_JOKEY_GET_RELE_STATUS, CURLOPT_NOPROGRESS, 1L);
-        curl_easy_setopt(curl_JOKEY_GET_RELE_STATUS, CURLOPT_MAXREDIRS, 50L);
-        curl_easy_setopt(curl_JOKEY_GET_RELE_STATUS, CURLOPT_TCP_KEEPALIVE, 1L);
-        curl_easy_setopt(curl_JOKEY_GET_RELE_STATUS, CURLOPT_TIMEOUT_MS, 1000);
+    curl_JOKEY_GET_STATUS = curl_easy_init();
+    if (curl_JOKEY_GET_STATUS) {
+        curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_URL, "http://192.168.0.88/get_status");
+        curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_NOPROGRESS, 1L);
+        curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_MAXREDIRS, 50L);
+        curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_TCP_KEEPALIVE, 1L);
+        curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_TIMEOUT_MS, 1000);
 
 
-        curl_easy_setopt(curl_JOKEY_GET_RELE_STATUS, CURLOPT_WRITEFUNCTION, writeFunction);
-        curl_easy_setopt(curl_JOKEY_GET_RELE_STATUS, CURLOPT_WRITEDATA, &response_string_JOKEY);
-        curl_easy_setopt(curl_JOKEY_GET_RELE_STATUS, CURLOPT_HEADERDATA, &header_string_JOKEY);
+        curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_WRITEFUNCTION, writeFunction);
+        curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_WRITEDATA, &response_string_JOKEY);
+        curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_HEADERDATA, &header_string_JOKEY);
     }
 
     curl_JOKEY_SET_START_ON = curl_easy_init();
     if (curl_JOKEY_SET_START_ON) {
-        curl_easy_setopt(curl_JOKEY_SET_START_ON, CURLOPT_URL, CURL_SETURI_JK);
-        curl_easy_setopt(curl_JOKEY_SET_START_ON, CURLOPT_POSTFIELDS, SET_RELE1_ON);
+        curl_easy_setopt(curl_JOKEY_SET_START_ON, CURLOPT_URL, "http://192.168.0.88/set_rele");
+        curl_easy_setopt(curl_JOKEY_SET_START_ON, CURLOPT_POSTFIELDS, "RELE[1][1]");
     }
 
     curl_JOKEY_SET_START_OFF = curl_easy_init();
     if (curl_JOKEY_SET_START_OFF) {
-        curl_easy_setopt(curl_JOKEY_SET_START_OFF, CURLOPT_URL, CURL_SETURI_JK);
-        curl_easy_setopt(curl_JOKEY_SET_START_OFF, CURLOPT_POSTFIELDS, SET_RELE1_OFF);
+        curl_easy_setopt(curl_JOKEY_SET_START_OFF, CURLOPT_URL, "http://192.168.0.88/set_rele");
+        curl_easy_setopt(curl_JOKEY_SET_START_OFF, CURLOPT_POSTFIELDS, "RELE[1][0]");
     }
 
     curl_JOKEY_SET_INIBIZIONE_ON = curl_easy_init();
     if (curl_JOKEY_SET_INIBIZIONE_ON) {
-        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_ON, CURLOPT_URL, CURL_SETURI_JK);
-        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_ON, CURLOPT_POSTFIELDS, SET_RELE2_ON);
+        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_ON, CURLOPT_URL, "http://192.168.0.88/set_rele");
+        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_ON, CURLOPT_POSTFIELDS, "RELE[2][1]");
     }
 
     curl_JOKEY_SET_INIBIZIONE_OFF = curl_easy_init();
     if (curl_JOKEY_SET_INIBIZIONE_OFF) {
-        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_OFF, CURLOPT_URL, CURL_SETURI_JK);
-        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_OFF, CURLOPT_POSTFIELDS, SET_RELE2_OFF);
+        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_OFF, CURLOPT_URL, "http://192.168.0.88/set_rele");
+        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_OFF, CURLOPT_POSTFIELDS, "RELE[2][0]");
     }
 
     //******************************SPRINKLER************************//
 
     std::string header_string_SPRINKLER;
 
-    curl_SPRINKLER_GET_RELE_STATUS = curl_easy_init();
-    if (curl_SPRINKLER_GET_RELE_STATUS) {
-        curl_easy_setopt(curl_SPRINKLER_GET_RELE_STATUS, CURLOPT_URL, CURL_GETURI_RELE_SP);
-        curl_easy_setopt(curl_SPRINKLER_GET_RELE_STATUS, CURLOPT_NOPROGRESS, 1L);
-        curl_easy_setopt(curl_SPRINKLER_GET_RELE_STATUS, CURLOPT_MAXREDIRS, 50L);
-        curl_easy_setopt(curl_SPRINKLER_GET_RELE_STATUS, CURLOPT_TCP_KEEPALIVE, 1L);
-        curl_easy_setopt(curl_SPRINKLER_GET_RELE_STATUS, CURLOPT_TIMEOUT_MS, 1000);
+    curl_SPRINKLER_GET_STATUS = curl_easy_init();
+    if (curl_SPRINKLER_GET_STATUS) {
+        curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_URL, "http://192.168.0.99/get_status");
+        curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_NOPROGRESS, 1L);
+        curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_MAXREDIRS, 50L);
+        curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_TCP_KEEPALIVE, 1L);
+        curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_TIMEOUT_MS, 1000);
 
 
-        curl_easy_setopt(curl_SPRINKLER_GET_RELE_STATUS, CURLOPT_WRITEFUNCTION, writeFunction);
-        curl_easy_setopt(curl_SPRINKLER_GET_RELE_STATUS, CURLOPT_WRITEDATA, &response_string_SPRINKLER);
-        curl_easy_setopt(curl_SPRINKLER_GET_RELE_STATUS, CURLOPT_HEADERDATA, &header_string_SPRINKLER);
+        curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_WRITEFUNCTION, writeFunction);
+        curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_WRITEDATA, &response_string_SPRINKLER);
+        curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_HEADERDATA, &header_string_SPRINKLER);
     }
 
     curl_SPRINKLER_SET_EV_ON = curl_easy_init();
     if (curl_SPRINKLER_SET_EV_ON) {
-        curl_easy_setopt(curl_SPRINKLER_SET_EV_ON, CURLOPT_URL, CURL_SETURI_SP);
-        curl_easy_setopt(curl_SPRINKLER_SET_EV_ON, CURLOPT_POSTFIELDS, SET_RELE1_ON);
+        curl_easy_setopt(curl_SPRINKLER_SET_EV_ON, CURLOPT_URL, "http://192.168.0.99/set_rele");
+        curl_easy_setopt(curl_SPRINKLER_SET_EV_ON, CURLOPT_POSTFIELDS, "RELE[1][1]");
     }
 
     curl_SPRINKLER_SET_EV_OFF = curl_easy_init();
     if (curl_SPRINKLER_SET_EV_OFF) {
-        curl_easy_setopt(curl_SPRINKLER_SET_EV_OFF, CURLOPT_URL, CURL_SETURI_SP);
-        curl_easy_setopt(curl_SPRINKLER_SET_EV_OFF, CURLOPT_POSTFIELDS, SET_RELE1_OFF);
+        curl_easy_setopt(curl_SPRINKLER_SET_EV_OFF, CURLOPT_URL, "http://192.168.0.99/set_rele");
+        curl_easy_setopt(curl_SPRINKLER_SET_EV_OFF, CURLOPT_POSTFIELDS, "RELE[1][0]");
     }
 
 
@@ -935,14 +904,10 @@ int main(int argc, char* argv[])
 
     while(1)
     {
-        send_curl_request(MOTOPOMPA_MB,curl_MP_GET_MODBUS);
-        send_curl_request(MOTOPOMPA_RELE,curl_MP_GET_RELE_STATUS);
-
-        send_curl_request(ELETTROPOMPA_MB,curl_EP_GET_MODBUS);
-        send_curl_request(ELETTROPOMPA_RELE,curl_EP_GET_RELE_STATUS);
-
-        //send_curl_request(JOKEY,curl_JOKEY_GET_RELE_STATUS);
-        //send_curl_request(SPRINKLER,curl_SPRINKLER_GET_RELE_STATUS);
+        send_curl_request(MOTOPOMPA,curl_MP_GET_MODBUS);
+        send_curl_request(ELETTROPOMPA,curl_EP_GET_MODBUS);
+        send_curl_request(JOKEY,curl_JOKEY_GET_STATUS);
+        send_curl_request(SPRINKLER,curl_SPRINKLER_GET_STATUS);
 
         //*********************************************************//
         int index_reg = 0;
@@ -957,9 +922,11 @@ int main(int argc, char* argv[])
         int16_t elettropompa_reg5_1 = 0;
         int16_t elettropompa_reg5_2 = 0;
 
-        std::vector<std::string> array_ep = split(response_string_modbus_EP,';');
+        std::vector<std::string> array_ep = split(response_string_EP,';');
+
         if(array_ep.size() > 1)
         {
+
             for(std::string var : array_ep)
             {
                 if(!var.empty())
@@ -980,19 +947,8 @@ int main(int argc, char* argv[])
             elettropompa_reg4 = tab_reg_ep_16[4];
             elettropompa_reg5_1 = (int16_t)(tab_reg_ep_16[5] >> 8);
             elettropompa_reg5_2 = (int16_t)tab_reg_ep_16[5];
+
         }
-
-        std::vector<std::string> array_ep_rele = split(response_string_rele_EP,',');
-
-        if(array_ep_rele.size() == 4)
-        {
-             line_rele_start_ep_status = std::stoul(array_ep_rele[0],nullptr,0);
-             line_rele_inib_ep_status = std::stoul(array_ep_rele[1],nullptr,0);
-             line_rele_stop_ep_status = std::stoul(array_ep_rele[2],nullptr,0);
-             line_rele_reset_ep_status = std::stoul(array_ep_rele[3],nullptr,0);
-        }
-
-
 
 
         //        for(uint16_t var : tab_reg_ep_16)
@@ -1019,7 +975,7 @@ int main(int argc, char* argv[])
         int motopompa_reg14_1 = {0};
         int motopompa_reg14_2 = {0};
 
-        std::vector<std::string> array_mp = split(response_string_modbus_MP,';');
+        std::vector<std::string> array_mp = split(response_string_MP,';');
 
 
         if(array_mp.size() > 1)
@@ -1061,17 +1017,6 @@ int main(int argc, char* argv[])
 
         }
 
-
-        std::vector<std::string> array_mp_rele = split(response_string_rele_MP,',');
-
-        if(array_mp_rele.size() == 4)
-        {
-             line_rele_start_mp_status = std::stoul(array_mp_rele[0],nullptr,0);
-             line_rele_inib_mp_status = std::stoul(array_mp_rele[1],nullptr,0);
-             line_rele_stop_mp_status = std::stoul(array_mp_rele[2],nullptr,0);
-             line_rele_reset_mp_status = std::stoul(array_mp_rele[3],nullptr,0);
-        }
-
         //        for(uint16_t var : tab_reg_mp_16)
         //        {
         //            std::cout << var <<" ";
@@ -1079,11 +1024,9 @@ int main(int argc, char* argv[])
 
 
 
-        printf("\r\n MOTO_POMPA %s %s ELETTRO_POMPA %s %s JOKEY %s SPRINKLER %s\r\n",
-               response_string_modbus_MP.c_str(),
-               response_string_rele_MP.c_str(),
-               response_string_modbus_EP.c_str(),
-               response_string_rele_EP.c_str(),
+        printf("\r\n MOTO_POMPA %s ELETTRO_POMPA %s JOKEY %s SPRINKLER %s\r\n",
+               response_string_MP.c_str(),
+               response_string_EP.c_str(),
                response_string_JOKEY.c_str(),
                response_string_SPRINKLER.c_str()); // @suppress("Method cannot be resolved")
 
@@ -1105,7 +1048,7 @@ int main(int argc, char* argv[])
 
         json payload_msg;
         payload_msg["rt"] = true;
-        payload_msg["u"] = DEVICE;
+        payload_msg["u"] = "testdev4";
         payload_msg["ts"] = JGuardian_param_istance.tp.tv_sec;
         payload_msg["t"] = 30;
         payload_msg["m"] = {
@@ -1238,26 +1181,23 @@ int main(int argc, char* argv[])
 
         //************************* STATO RELE ********************//
 
-        {{"m", RELE_CAMERA_STATO}, {"v", line_rele_camera_status}},
-        {{"m", RELE_LUCI_STATO}, {"v", line_rele_luci_status}},
+        {{"m", "testdev4_rele_camera"}, {"v", line_rele_camera_status}},
+        {{"m", "testdev4_rele_luci"}, {"v", line_rele_luci_status}},
 
-        {{"m", RELE_START_EP_STATO}, {"v", line_rele_start_ep_status}},
-        {{"m", RELE_INIB_EP_STATO}, {"v", line_rele_inib_ep_status}},
-        {{"m", RELE_STOP_EP_STATO}, {"v", line_rele_stop_ep_status}},
-        {{"m", RELE_RESET_EP_STATO}, {"v", line_rele_reset_ep_status}},
+        {{"m", "testdev4_start_ep"}, {"v", line_rele_start_ep_status}},
+        {{"m", "testdev4_inib_ep"}, {"v", line_rele_inib_ep_status}},
+        {{"m", "testdev4_stop_ep"}, {"v", line_rele_stop_ep_status}},
+        {{"m", "testdev4_reset_ep"}, {"v", line_rele_reset_ep_status}},
 
-        {{"m", RELE_START_MP_STATO}, {"v", line_rele_start_mp_status}},
-        {{"m", RELE_INIB_MP_STATO}, {"v", line_rele_inib_mp_status}},
-        {{"m", RELE_STOP_MP_STATO}, {"v", line_rele_stop_mp_status}},
-        {{"m", RELE_RESET_MP_STATO}, {"v", line_rele_reset_mp_status}},
+        {{"m", "testdev4_start_mp"}, {"v", line_rele_start_mp_status}},
+        {{"m", "testdev4_inib_mp"}, {"v", line_rele_inib_mp_status}},
+        {{"m", "testdev4_stop_mp"}, {"v", line_rele_stop_mp_status}},
+        {{"m", "testdev4_reset_mp"}, {"v", line_rele_reset_mp_status}},
 
-        {{"m", RELE_START_JK_STATO}, {"v", line_rele_start_jk_status}},
-        {{"m", RELE_INIB_JK_STATO}, {"v", line_rele_inib_jk_status}},
+        {{"m", "testdev4_start_jk"}, {"v", line_rele_start_jk_status}},
+        {{"m", "testdev4_inib_jk"}, {"v", line_rele_inib_jk_status}},
 
-        {{"m", RELE_START_SP_STATO}, {"v", line_rele_start_sp_status}},
-
-        {{"m", LIVELLO_PRESSIONE1}, {"v", ad_value6_ch1}},
-        {{"m", LIVELLO_PRESSIONE2}, {"v", ad_value2_ch1}}
+        {{"m", "testdev4_ev_spk"}, {"v", line_rele_start_sp_status}},
 
     };
 
@@ -1275,7 +1215,7 @@ int main(int argc, char* argv[])
     pubmsg.retained = 0;
     deliveredtoken = 0;
 
-    if((MQTTAsync_isConnected(client) == 1)&&(start_remote_test == true))
+    if(MQTTAsync_isConnected(client) == 1)
     {
         int rc;
         MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
