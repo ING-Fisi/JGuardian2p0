@@ -692,7 +692,7 @@ int main(int argc, char* argv[])
 
     curl_MP_GET_MODBUS = curl_easy_init();
     if (curl_MP_GET_MODBUS) {
-        curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_URL, "http://192.168.0.66/get_modbus");
+        curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_URL, "http://10.100.0.66/get_modbus");
         curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_NOPROGRESS, 1L);
         curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_MAXREDIRS, 50L);
         curl_easy_setopt(curl_MP_GET_MODBUS, CURLOPT_TCP_KEEPALIVE, 1L);
@@ -706,49 +706,49 @@ int main(int argc, char* argv[])
 
     curl_MP_SET_START_ON = curl_easy_init();
     if (curl_MP_SET_START_ON) {
-        curl_easy_setopt(curl_MP_SET_START_ON, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_START_ON, CURLOPT_URL, "http://10.100.0.66/set_rele");
         curl_easy_setopt(curl_MP_SET_START_ON, CURLOPT_POSTFIELDS, "RELE[1][1]");
     }
 
     curl_MP_SET_START_OFF = curl_easy_init();
     if (curl_MP_SET_START_OFF) {
-        curl_easy_setopt(curl_MP_SET_START_OFF, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_START_OFF, CURLOPT_URL, "http://10.100.0.66/set_rele");
         curl_easy_setopt(curl_MP_SET_START_OFF, CURLOPT_POSTFIELDS, "RELE[1][0]");
     }
 
     curl_MP_SET_INIBIZIONE_ON = curl_easy_init();
     if (curl_MP_SET_INIBIZIONE_ON) {
-        curl_easy_setopt(curl_MP_SET_INIBIZIONE_ON, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_INIBIZIONE_ON, CURLOPT_URL, "http://10.100.0.66/set_rele");
         curl_easy_setopt(curl_MP_SET_INIBIZIONE_ON, CURLOPT_POSTFIELDS, "RELE[2][1]");
     }
 
     curl_MP_SET_INIBIZIONE_OFF = curl_easy_init();
     if (curl_MP_SET_INIBIZIONE_OFF) {
-        curl_easy_setopt(curl_MP_SET_INIBIZIONE_OFF, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_INIBIZIONE_OFF, CURLOPT_URL, "http://10.100.0.66/set_rele");
         curl_easy_setopt(curl_MP_SET_INIBIZIONE_OFF, CURLOPT_POSTFIELDS, "RELE[2][0]");
     }
 
     curl_MP_SET_STOP_ON = curl_easy_init();
     if (curl_MP_SET_STOP_ON) {
-        curl_easy_setopt(curl_MP_SET_STOP_ON, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_STOP_ON, CURLOPT_URL, "http://10.100.0.66/set_rele");
         curl_easy_setopt(curl_MP_SET_STOP_ON, CURLOPT_POSTFIELDS, "RELE[3][1]");
     }
 
     curl_MP_SET_STOP_OFF = curl_easy_init();
     if (curl_MP_SET_STOP_OFF) {
-        curl_easy_setopt(curl_MP_SET_STOP_OFF, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_STOP_OFF, CURLOPT_URL, "http://10.100.0.66/set_rele");
         curl_easy_setopt(curl_MP_SET_STOP_OFF, CURLOPT_POSTFIELDS, "RELE[3][0]");
     }
 
     curl_MP_SET_RESET_ON = curl_easy_init();
     if (curl_MP_SET_RESET_ON) {
-        curl_easy_setopt(curl_MP_SET_RESET_ON, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_RESET_ON, CURLOPT_URL, "http://10.100.0.66/set_rele");
         curl_easy_setopt(curl_MP_SET_RESET_ON, CURLOPT_POSTFIELDS, "RELE[4][1]");
     }
 
     curl_MP_SET_RESET_OFF = curl_easy_init();
     if (curl_MP_SET_RESET_OFF) {
-        curl_easy_setopt(curl_MP_SET_RESET_OFF, CURLOPT_URL, "http://192.168.0.66/set_rele");
+        curl_easy_setopt(curl_MP_SET_RESET_OFF, CURLOPT_URL, "http://10.100.0.66/set_rele");
         curl_easy_setopt(curl_MP_SET_RESET_OFF, CURLOPT_POSTFIELDS, "RELE[4][0]");
     }
 
@@ -759,7 +759,7 @@ int main(int argc, char* argv[])
 
     curl_EP_GET_MODBUS = curl_easy_init();
     if (curl_EP_GET_MODBUS) {
-        curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_URL, "http://192.168.0.77/get_modbus");
+        curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_URL, "http://10.100.0.77/get_modbus");
         curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_NOPROGRESS, 1L);
         curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_MAXREDIRS, 50L);
         curl_easy_setopt(curl_EP_GET_MODBUS, CURLOPT_TCP_KEEPALIVE, 1L);
@@ -773,49 +773,49 @@ int main(int argc, char* argv[])
 
     curl_EP_SET_START_ON = curl_easy_init();
     if (curl_EP_SET_START_ON) {
-        curl_easy_setopt(curl_EP_SET_START_ON, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_START_ON, CURLOPT_URL, "http://10.100.0.77/set_rele");
         curl_easy_setopt(curl_EP_SET_START_ON, CURLOPT_POSTFIELDS, "RELE[1][1]");
     }
 
     curl_EP_SET_START_OFF = curl_easy_init();
     if (curl_EP_SET_START_OFF) {
-        curl_easy_setopt(curl_EP_SET_START_OFF, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_START_OFF, CURLOPT_URL, "http://10.100.0.77/set_rele");
         curl_easy_setopt(curl_EP_SET_START_OFF, CURLOPT_POSTFIELDS, "RELE[1][0]");
     }
 
     curl_EP_SET_INIBIZIONE_ON = curl_easy_init();
     if (curl_EP_SET_INIBIZIONE_ON) {
-        curl_easy_setopt(curl_EP_SET_INIBIZIONE_ON, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_INIBIZIONE_ON, CURLOPT_URL, "http://10.100.0.77/set_rele");
         curl_easy_setopt(curl_EP_SET_INIBIZIONE_ON, CURLOPT_POSTFIELDS, "RELE[2][1]");
     }
 
     curl_EP_SET_INIBIZIONE_OFF = curl_easy_init();
     if (curl_EP_SET_INIBIZIONE_OFF) {
-        curl_easy_setopt(curl_EP_SET_INIBIZIONE_OFF, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_INIBIZIONE_OFF, CURLOPT_URL, "http://10.100.0.77/set_rele");
         curl_easy_setopt(curl_EP_SET_INIBIZIONE_OFF, CURLOPT_POSTFIELDS, "RELE[2][0]");
     }
 
     curl_EP_SET_STOP_ON = curl_easy_init();
     if (curl_EP_SET_STOP_ON) {
-        curl_easy_setopt(curl_EP_SET_STOP_ON, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_STOP_ON, CURLOPT_URL, "http://10.100.0.77/set_rele");
         curl_easy_setopt(curl_EP_SET_STOP_ON, CURLOPT_POSTFIELDS, "RELE[3][1]");
     }
 
     curl_EP_SET_STOP_OFF = curl_easy_init();
     if (curl_EP_SET_STOP_OFF) {
-        curl_easy_setopt(curl_EP_SET_STOP_OFF, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_STOP_OFF, CURLOPT_URL, "http://10.100.0.77/set_rele");
         curl_easy_setopt(curl_EP_SET_STOP_OFF, CURLOPT_POSTFIELDS, "RELE[3][0]");
     }
 
     curl_EP_SET_RESET_ON = curl_easy_init();
     if (curl_EP_SET_RESET_ON) {
-        curl_easy_setopt(curl_EP_SET_RESET_ON, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_RESET_ON, CURLOPT_URL, "http://10.100.0.77/set_rele");
         curl_easy_setopt(curl_EP_SET_RESET_ON, CURLOPT_POSTFIELDS, "RELE[4][1]");
     }
 
     curl_EP_SET_RESET_OFF = curl_easy_init();
     if (curl_EP_SET_RESET_OFF) {
-        curl_easy_setopt(curl_EP_SET_RESET_OFF, CURLOPT_URL, "http://192.168.0.77/set_rele");
+        curl_easy_setopt(curl_EP_SET_RESET_OFF, CURLOPT_URL, "http://10.100.0.77/set_rele");
         curl_easy_setopt(curl_EP_SET_RESET_OFF, CURLOPT_POSTFIELDS, "RELE[4][0]");
     }
 
@@ -826,7 +826,7 @@ int main(int argc, char* argv[])
 
     curl_JOKEY_GET_STATUS = curl_easy_init();
     if (curl_JOKEY_GET_STATUS) {
-        curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_URL, "http://192.168.0.88/get_status");
+        curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_URL, "http://10.100.0.88/get_status");
         curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_NOPROGRESS, 1L);
         curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_MAXREDIRS, 50L);
         curl_easy_setopt(curl_JOKEY_GET_STATUS, CURLOPT_TCP_KEEPALIVE, 1L);
@@ -840,25 +840,25 @@ int main(int argc, char* argv[])
 
     curl_JOKEY_SET_START_ON = curl_easy_init();
     if (curl_JOKEY_SET_START_ON) {
-        curl_easy_setopt(curl_JOKEY_SET_START_ON, CURLOPT_URL, "http://192.168.0.88/set_rele");
+        curl_easy_setopt(curl_JOKEY_SET_START_ON, CURLOPT_URL, "http://10.100.0.88/set_rele");
         curl_easy_setopt(curl_JOKEY_SET_START_ON, CURLOPT_POSTFIELDS, "RELE[1][1]");
     }
 
     curl_JOKEY_SET_START_OFF = curl_easy_init();
     if (curl_JOKEY_SET_START_OFF) {
-        curl_easy_setopt(curl_JOKEY_SET_START_OFF, CURLOPT_URL, "http://192.168.0.88/set_rele");
+        curl_easy_setopt(curl_JOKEY_SET_START_OFF, CURLOPT_URL, "http://10.100.0.88/set_rele");
         curl_easy_setopt(curl_JOKEY_SET_START_OFF, CURLOPT_POSTFIELDS, "RELE[1][0]");
     }
 
     curl_JOKEY_SET_INIBIZIONE_ON = curl_easy_init();
     if (curl_JOKEY_SET_INIBIZIONE_ON) {
-        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_ON, CURLOPT_URL, "http://192.168.0.88/set_rele");
+        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_ON, CURLOPT_URL, "http://10.100.0.88/set_rele");
         curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_ON, CURLOPT_POSTFIELDS, "RELE[2][1]");
     }
 
     curl_JOKEY_SET_INIBIZIONE_OFF = curl_easy_init();
     if (curl_JOKEY_SET_INIBIZIONE_OFF) {
-        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_OFF, CURLOPT_URL, "http://192.168.0.88/set_rele");
+        curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_OFF, CURLOPT_URL, "http://10.100.0.88/set_rele");
         curl_easy_setopt(curl_JOKEY_SET_INIBIZIONE_OFF, CURLOPT_POSTFIELDS, "RELE[2][0]");
     }
 
@@ -868,7 +868,7 @@ int main(int argc, char* argv[])
 
     curl_SPRINKLER_GET_STATUS = curl_easy_init();
     if (curl_SPRINKLER_GET_STATUS) {
-        curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_URL, "http://192.168.0.99/get_status");
+        curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_URL, "http://10.100.0.99/get_status");
         curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_NOPROGRESS, 1L);
         curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_MAXREDIRS, 50L);
         curl_easy_setopt(curl_SPRINKLER_GET_STATUS, CURLOPT_TCP_KEEPALIVE, 1L);
@@ -882,13 +882,13 @@ int main(int argc, char* argv[])
 
     curl_SPRINKLER_SET_EV_ON = curl_easy_init();
     if (curl_SPRINKLER_SET_EV_ON) {
-        curl_easy_setopt(curl_SPRINKLER_SET_EV_ON, CURLOPT_URL, "http://192.168.0.99/set_rele");
+        curl_easy_setopt(curl_SPRINKLER_SET_EV_ON, CURLOPT_URL, "http://10.100.0.99/set_rele");
         curl_easy_setopt(curl_SPRINKLER_SET_EV_ON, CURLOPT_POSTFIELDS, "RELE[1][1]");
     }
 
     curl_SPRINKLER_SET_EV_OFF = curl_easy_init();
     if (curl_SPRINKLER_SET_EV_OFF) {
-        curl_easy_setopt(curl_SPRINKLER_SET_EV_OFF, CURLOPT_URL, "http://192.168.0.99/set_rele");
+        curl_easy_setopt(curl_SPRINKLER_SET_EV_OFF, CURLOPT_URL, "http://10.100.0.99/set_rele");
         curl_easy_setopt(curl_SPRINKLER_SET_EV_OFF, CURLOPT_POSTFIELDS, "RELE[1][0]");
     }
 

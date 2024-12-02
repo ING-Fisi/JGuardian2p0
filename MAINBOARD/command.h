@@ -80,19 +80,19 @@
 
 //************************************************************************************************//
 
-#define CURL_GETURI_MODBUS_MP "http://192.168.0.66/get_modbus"
-#define CURL_GETURI_RELE_MP "http://192.168.0.66/get_rele_status"
-#define CURL_SETURI_MP "http://192.168.0.66/set_rele"
+#define CURL_GETURI_MODBUS_MP "http://10.100.0.66/get_modbus"
+#define CURL_GETURI_RELE_MP "http://10.100.0.66/get_rele_status"
+#define CURL_SETURI_MP "http://10.100.0.66/set_rele"
 
-#define CURL_GETURI_MODBUS_EP "http://192.168.0.77/get_modbus"
-#define CURL_GETURI_RELE_EP "http://192.168.077/get_rele_status"
-#define CURL_SETURI_EP "http://192.168.0.77/set_rele"
+#define CURL_GETURI_MODBUS_EP "http://10.100.0.77/get_modbus"
+#define CURL_GETURI_RELE_EP "http://10.100.077/get_rele_status"
+#define CURL_SETURI_EP "http://10.100.0.77/set_rele"
 
-#define CURL_GETURI_RELE_JK "http://192.168.0.88/get_rele_status"
-#define CURL_SETURI_JK "http://192.168.0.88/set_rele"
+#define CURL_GETURI_RELE_JK "http://10.100.0.88/get_rele_status"
+#define CURL_SETURI_JK "http://10.100.0.88/set_rele"
 
 #define CURL_GETURI_RELE_SP "http://10.100.0.99/get_rele_status"
-#define CURL_SETURI_SP "http://192.168.0.99/set_rele"
+#define CURL_SETURI_SP "http://10.100.0.99/set_rele"
 
 #endif
 

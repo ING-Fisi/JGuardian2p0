@@ -32,27 +32,6 @@
 #include "esp_timer.h"
 
 
-//*****************************************//
-#define CONFIG_EXAMPLE_WIFI_SSID "FisitronHUB"
-#define CONFIG_EXAMPLE_WIFI_PASSWORD "Fisitron319086"
-#define CONFIG_EXAMPLE_MAXIMUM_RETRY 30
-#define CONFIG_EXAMPLE_STATIC_IP_ADDR "10.100.0.99"
-#define CONFIG_EXAMPLE_STATIC_NETMASK_ADDR "255.255.255.0"
-#define CONFIG_EXAMPLE_STATIC_GW_ADDR "10.100.0.1"
-
-
-#define EXAMPLE_WIFI_SSID             CONFIG_EXAMPLE_WIFI_SSID
-#define EXAMPLE_WIFI_PASS             CONFIG_EXAMPLE_WIFI_PASSWORD
-#define EXAMPLE_MAXIMUM_RETRY         CONFIG_EXAMPLE_MAXIMUM_RETRY
-#define EXAMPLE_STATIC_IP_ADDR        CONFIG_EXAMPLE_STATIC_IP_ADDR
-#define EXAMPLE_STATIC_NETMASK_ADDR   CONFIG_EXAMPLE_STATIC_NETMASK_ADDR
-#define EXAMPLE_STATIC_GW_ADDR        CONFIG_EXAMPLE_STATIC_GW_ADDR
-//#ifdef CONFIG_EXAMPLE_STATIC_DNS_AUTO
-#define EXAMPLE_MAIN_DNS_SERVER       EXAMPLE_STATIC_GW_ADDR
-#define EXAMPLE_BACKUP_DNS_SERVER     "0.0.0.0"
-
-//*****************************************//
-
 static const char *TAG = "JGUARDIAN_HUB_SPRINKLER";
 
 
@@ -69,25 +48,6 @@ static const char *TAG = "JGUARDIAN_HUB_SPRINKLER";
 #define GPIO_OUTPUT_IO_3    25
 #define GPIO_OUTPUT_PIN_SEL_2  (1ULL<<GPIO_OUTPUT_IO_3)
 
-
-//************************* INGRESSI ******************************//
-#define GPIO_INPUT_IO_IN1   19
-#define GPIO_INPUT_PIN_SEL_IN1  (1ULL<<GPIO_INPUT_IO_IN1)
-
-#define GPIO_INPUT_IO_IN2   5
-#define GPIO_INPUT_PIN_SEL_IN2  (1ULL<<GPIO_INPUT_IO_IN2)
-
-#define GPIO_INPUT_IO_IN3   16
-#define GPIO_INPUT_PIN_SEL_IN3  (1ULL<<GPIO_INPUT_IO_IN3)
-
-#define GPIO_INPUT_IO_IN4   0
-#define GPIO_INPUT_PIN_SEL_IN4  (1ULL<<GPIO_INPUT_IO_IN4)
-
-
-
-
-
-httpd_handle_t start_webserver(void);
 
 
 void wifi_init_sta(void);
