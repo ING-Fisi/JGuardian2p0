@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.11.0, 2024-12-02T10:50:46. -->
+<!-- Written by QtCreator 4.11.0, 2024-12-02T15:00:23. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -246,6 +246,7 @@
        <value type="QString">/home/biglap/PROGETTI/GEI/build-JGuardian2p0-STM32MP1-Debug/JGuardian2p0</value>
        <value type="QString">/home/biglap/PROGETTI/GEI/build-JGuardian2p0-STM32MP1-Debug/JGuardian2p0</value>
        <value type="QString">/home/biglap/PROGETTI/GEI/build-JGuardian2p0-STM32MP1-Debug/JGuardian2p0</value>
+       <value type="QString">/home/biglap/PROGETTI/GEI/build-JGuardian2p0-STM32MP1-Debug/JGuardian2p0</value>
       </valuelist>
       <valuelist type="QVariantList" key="ProjectExplorer.RunConfiguration.LastDeployedHosts">
        <value type="QString">192.168.0.106</value>
@@ -254,10 +255,12 @@
        <value type="QString">192.168.10.73</value>
        <value type="QString">10.100.0.33</value>
        <value type="QString">77.62.194.83</value>
+       <value type="QString">10.100.0.103</value>
        <value type="QString">10.100.0.200</value>
        <value type="QString">10.100.0.3</value>
       </valuelist>
       <valuelist type="QVariantList" key="ProjectExplorer.RunConfiguration.LastDeployedRemotePaths">
+       <value type="QString">/home/fisitron/JGuardian2p0/bin</value>
        <value type="QString">/home/fisitron/JGuardian2p0/bin</value>
        <value type="QString">/home/fisitron/JGuardian2p0/bin</value>
        <value type="QString">/home/fisitron/JGuardian2p0/bin</value>
@@ -276,6 +279,7 @@
        <value type="QString">/opt/st/stm32mp1/4.2.2-snapshot/sysroots/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi</value>
        <value type="QString">/opt/st/stm32mp1/4.2.2-snapshot/sysroots/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi</value>
        <value type="QString">/opt/st/stm32mp1/4.2.2-snapshot/sysroots/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi</value>
+       <value type="QString">/opt/st/stm32mp1/4.2.2-snapshot/sysroots/cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi</value>
       </valuelist>
       <value type="bool" key="RemoteLinux.GenericDirectUploadStep.IgnoreMissingFiles">false</value>
       <value type="bool" key="RemoteLinux.GenericDirectUploadStep.Incremental">true</value>
@@ -286,7 +290,8 @@
        <value type="QDateTime">2024-10-21T10:12:41.441</value>
        <value type="QDateTime">2024-11-11T15:30:12.612</value>
        <value type="QDateTime">2024-11-27T12:35:43.476</value>
-       <value type="QDateTime">2024-11-28T08:41:15.650</value>
+       <value type="QDateTime">2024-12-02T12:04:28.748</value>
+       <value type="QDateTime">2024-12-02T13:37:33.114</value>
        <value type="QDateTime">2024-10-31T15:18:41.514</value>
       </valuelist>
       <valuelist type="QVariantList" key="RemoteLinux.LastDeployedRemoteTimes">
@@ -296,7 +301,8 @@
        <value type="QDateTime">2024-10-21T10:19:13.000</value>
        <value type="QDateTime">2024-11-11T15:23:32.000</value>
        <value type="QDateTime">2024-11-27T12:36:57.000</value>
-       <value type="QDateTime">2024-11-28T09:24:46.000</value>
+       <value type="QDateTime">2024-12-02T12:04:47.000</value>
+       <value type="QDateTime">2024-12-02T13:36:16.000</value>
        <value type="QDateTime">2023-03-03T11:18:12.000</value>
       </valuelist>
      </valuemap>

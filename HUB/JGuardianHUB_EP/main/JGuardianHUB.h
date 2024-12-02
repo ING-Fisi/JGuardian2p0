@@ -33,28 +33,6 @@
 static const char *TAG = "JGUARDIAN_HUB_EP";
 
 
-////************************* RELE ******************************//
-//#define GPIO_OUTPUT_IO_LED    38
-//#define GPIO_OUTPUT_PIN_SEL_LED  (1ULL<<GPIO_OUTPUT_IO_LED)
-//
-//#define GPIO_OUTPUT_IO_1    1
-//#define GPIO_OUTPUT_PIN_SEL_0  (1ULL<<GPIO_OUTPUT_IO_1)
-//
-//#define GPIO_OUTPUT_IO_2    2
-//#define GPIO_OUTPUT_PIN_SEL_1  (1ULL<<GPIO_OUTPUT_IO_2)
-//
-//#define GPIO_OUTPUT_IO_3    41
-//#define GPIO_OUTPUT_PIN_SEL_2  (1ULL<<GPIO_OUTPUT_IO_3)
-//
-//#define GPIO_OUTPUT_IO_4    42
-//#define GPIO_OUTPUT_PIN_SEL_3  (1ULL<<GPIO_OUTPUT_IO_4)
-//
-//#define GPIO_OUTPUT_IO_5    45
-//#define GPIO_OUTPUT_PIN_SEL_4  (1ULL<<GPIO_OUTPUT_IO_5)
-//
-//#define GPIO_OUTPUT_IO_6    46
-//#define GPIO_OUTPUT_PIN_SEL_5  (1ULL<<GPIO_OUTPUT_IO_6)
-
 
 //************************* RELE ******************************//
 #define GPIO_OUTPUT_IO_LED    21
@@ -69,19 +47,10 @@ static const char *TAG = "JGUARDIAN_HUB_EP";
 #define GPIO_OUTPUT_IO_3    25
 #define GPIO_OUTPUT_PIN_SEL_2  (1ULL<<GPIO_OUTPUT_IO_3)
 
+#define GPIO_OUTPUT_IO_4    26
+#define GPIO_OUTPUT_PIN_SEL_3  (1ULL<<GPIO_OUTPUT_IO_4)
 
-//************************* INGRESSI ******************************//
-#define GPIO_INPUT_IO_IN1   19
-#define GPIO_INPUT_PIN_SEL_IN1  (1ULL<<GPIO_INPUT_IO_IN1)
 
-#define GPIO_INPUT_IO_IN2   5
-#define GPIO_INPUT_PIN_SEL_IN2  (1ULL<<GPIO_INPUT_IO_IN2)
-
-#define GPIO_INPUT_IO_IN3   16
-#define GPIO_INPUT_PIN_SEL_IN3  (1ULL<<GPIO_INPUT_IO_IN3)
-
-#define GPIO_INPUT_IO_IN4   0
-#define GPIO_INPUT_PIN_SEL_IN4  (1ULL<<GPIO_INPUT_IO_IN4)
 
 
 httpd_handle_t start_JGuardian_SERVER();

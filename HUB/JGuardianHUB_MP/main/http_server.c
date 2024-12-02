@@ -155,16 +155,14 @@ static esp_err_t set_rele_post_handler(httpd_req_t *req) {
     ESP_LOGI(TAG, "RELE3_OFF");
     gpio_set_level(GPIO_OUTPUT_IO_3, false);
   }
-  //	if((rele_id == 4)&&(rele_status == 1))
-  //    {
-  //		ESP_LOGI(TAG, "RELE4_ON");
-  //		gpio_set_level(GPIO_OUTPUT_IO_4, true);
-  //	}
-  //	 if((rele_id == 4)&&(rele_status == 0))
-  //    {
-  //		ESP_LOGI(TAG, "RELE4_OFF");
-  //		gpio_set_level(GPIO_OUTPUT_IO_4, false);
-  //	}
+  if ((rele_id == 4) && (rele_status == 1)) {
+    ESP_LOGI(TAG, "RELE4_ON");
+    gpio_set_level(GPIO_OUTPUT_IO_4, true);
+  }
+  if ((rele_id == 4) && (rele_status == 0)) {
+    ESP_LOGI(TAG, "RELE4_OFF");
+    gpio_set_level(GPIO_OUTPUT_IO_4, false);
+  }
 
   // End response
   httpd_resp_send_chunk(req, NULL, 0);

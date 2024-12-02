@@ -31,8 +31,6 @@ void ctrl_tsk(void) {
 	
 	    // Initialization of device peripheral and objects
 
-	//server = start_webserver();
-
 	get_mac_str(tmp_macstr);
 
 while (1) {
@@ -100,7 +98,7 @@ void app_main(void)
 	//disable interrupt
 	io_conf_0.intr_type = GPIO_INTR_DISABLE;
 	//set as output mode
-	io_conf_0.mode = GPIO_MODE_OUTPUT;
+	io_conf_0.mode = GPIO_MODE_INPUT_OUTPUT;
 	//bit mask of the pins that you want to set,e.g.GPIO18/19
 	io_conf_0.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_0;
 	//disable pull-down mode
@@ -115,7 +113,7 @@ void app_main(void)
 	//disable interrupt
 	io_conf_1.intr_type = GPIO_INTR_DISABLE;
 	//set as output mode
-	io_conf_1.mode = GPIO_MODE_OUTPUT;
+	io_conf_1.mode = GPIO_MODE_INPUT_OUTPUT;
 	//bit mask of the pins that you want to set,e.g.GPIO18/19
 	io_conf_1.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_1;
 	//disable pull-down mode
@@ -130,7 +128,7 @@ void app_main(void)
 	//disable interrupt
 	io_conf_2.intr_type = GPIO_INTR_DISABLE;
 	//set as output mode
-	io_conf_2.mode = GPIO_MODE_OUTPUT;
+	io_conf_2.mode = GPIO_MODE_INPUT_OUTPUT;
 	//bit mask of the pins that you want to set,e.g.GPIO18/19
 	io_conf_2.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_2;
 	//disable pull-down mode
