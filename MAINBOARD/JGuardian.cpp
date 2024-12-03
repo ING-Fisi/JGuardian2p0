@@ -37,7 +37,6 @@ MQTTAsync_connectOptions conn_opts;
 using json = nlohmann::json;
 volatile MQTTAsync_token deliveredtoken;
 
-int finished = 0;
 bool start_remote_test = false;
 
 
@@ -282,12 +281,12 @@ bool line_rele_start_sp_status = false;
 
 //*************************** ADC *********************************//
 #include "Analog.h"
+#define SENSORE_PRESSIONE_A_OFFSET 10479
+#define SENSORE_PRESSIONE_B_OFFSET 10479
 
-int ad_value6_ch0=0;
-int ad_value13_ch0=0;
-int ad_value2_ch1=0;
-int ad_value6_ch1=0;
 
+int sensore_pressione_a = 0;
+int sensore_pressione_b = 0;
 //***********************************************************************//
 
 
@@ -378,7 +377,7 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
 
         sleep(TIMER_CMD);
 
-        printf("COMANDO curl_EP_SET_START_OFFr\n");
+        printf("COMANDO curl_EP_SET_START_OFF\r\n");
         send_curl_request(ELETTROPOMPA_RELE,curl_EP_SET_START_OFF);
         //line_rele_start_ep_status = false;
     }
@@ -538,6 +537,13 @@ void connlost(void *context, char *cause)
 {
 
     printf("Connection lost\r\n");
+    std::ostringstream ss;
+    ss << endl;
+    ss << "\t" << "Connection lost";
+    pLogger->info(ss);
+
+
+    sleep(5);
 
     mqtt_connection();
 
@@ -545,7 +551,6 @@ void connlost(void *context, char *cause)
 void onDisconnect(void* context, MQTTAsync_successData* response)
 {
     printf("Successful disconnection\r\n");
-    finished = 1;
 }
 void onSend(void* context, MQTTAsync_successData* response)
 {
@@ -554,13 +559,26 @@ void onSend(void* context, MQTTAsync_successData* response)
 void onConnectFailure(void* context, MQTTAsync_failureData* response)
 {
     printf("CLIENT Connect failed, rc %d %s\r\n", response ? response->code : 0,response->message);
-    finished = 1;
+
+    std::ostringstream ss;
+    ss << endl;
+    ss << "\t" << "CLIENT Connect failed, rc " << response->code << response->message;
+    pLogger->info(ss);
+
+    sleep(5);
+
+    mqtt_connection();
+
 }
 
 
 void onConnect(void* context, MQTTAsync_successData* response)
 {
     printf("Successful connection CLIENT\n");
+    std::ostringstream ss;
+    ss << endl;
+    ss << "\t" << "Successful connection CLIENT" ;
+    pLogger->info(ss);
 
     MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
     int rc;
@@ -573,7 +591,11 @@ void onConnect(void* context, MQTTAsync_successData* response)
     if ((rc = MQTTAsync_subscribe(client, TOPIC_SUB, QOS, &opts)) != MQTTASYNC_SUCCESS)
     {
         printf("Failed to start subscribe, return code %d\r\n", rc);
-        finished = 1;
+        std::ostringstream ss;
+        ss << endl;
+        ss << "\t" << "Failed to start subscribe, return code" << rc;
+        pLogger->info(ss);
+
     }
 
 }
@@ -648,17 +670,15 @@ int main(int argc, char* argv[])
     gpio_write(PORT_RELE3, OFFSET_RELE3, 0);
     gpio_write(PORT_RELE4, OFFSET_RELE4, 0);
 
-     exit(EXIT_FAILURE);
-
-
-    if(mqtt_connection() == false)
-    {
-        exit(EXIT_FAILURE);
-    }
+    mqtt_connection();
 
     //********************************************************************************//
 
     printf("START JGUARDIAN 2p0");
+    std::ostringstream ss;
+    ss << endl;
+    ss << "\t" << "Start JGuardian 2p0 DONE" ;
+    pLogger->info(ss);
 
     //******************************MOTOPOMPA************************//
 
@@ -1077,12 +1097,36 @@ int main(int argc, char* argv[])
 
 
 
+        int ad_value6_ch0=0;
+        int ad_value13_ch0=0;
+        int ad_value2_ch1=0;
+        int ad_value6_ch1=0;
+
         read_ADvalue_row_ch0((char*)"in_voltage6_raw",&ad_value6_ch0);
         read_ADvalue_row_ch0((char*)"in_voltage13_raw",&ad_value13_ch0);
         read_ADvalue_row_ch1((char*)"in_voltage2_raw",&ad_value2_ch1);
         read_ADvalue_row_ch1((char*)"in_voltage6_raw",&ad_value6_ch1);
 
-        printf("\r\n ANALOG CHANNEL [%d][%d][%d][%d]\r\n",ad_value6_ch0,ad_value13_ch0,ad_value2_ch1,ad_value6_ch1);
+        sensore_pressione_a = (((ad_value6_ch1 - SENSORE_PRESSIONE_A_OFFSET) / 2453) * 1000);
+        sensore_pressione_b = (((ad_value2_ch1 - SENSORE_PRESSIONE_B_OFFSET) / 2453) * 1000);
+
+
+
+        printf("\r\n ANALOG CHANNEL [%d][%d][%d][%d]\r\n",ad_value6_ch0,ad_value13_ch0,sensore_pressione_b,sensore_pressione_a);
+
+
+
+        std::ostringstream ss;
+        ss << "\t" << "MOTO_POMPA MODBUS" << response_string_modbus_MP;
+        ss << "\t" << "MOTO_POMPA RELE" << response_string_rele_MP << endl;
+
+        ss << "\t" << "ELETTRO_POMPA MODBUS" << response_string_modbus_EP;
+        ss << "\t" << "ELETTRO_POMPA RELE" << response_string_rele_EP << endl;
+
+        ss << "\t" << "JOKEY RELE" << response_string_JOKEY << endl;
+
+        ss << "\t" << "SPRINKLER RELE" << response_string_SPRINKLER << endl;
+        pLogger->info(ss);
 
 
         //****************************************************************************************************//
@@ -1244,8 +1288,8 @@ int main(int argc, char* argv[])
 
         {{"m", RELE_START_SP_STATO}, {"v", line_rele_start_sp_status}},
 
-        {{"m", LIVELLO_PRESSIONE1}, {"v", ad_value6_ch1}},
-        {{"m", LIVELLO_PRESSIONE2}, {"v", ad_value2_ch1}}
+        {{"m", LIVELLO_PRESSIONE1}, {"v", sensore_pressione_a}},
+        {{"m", LIVELLO_PRESSIONE2}, {"v", sensore_pressione_b}}
 
     };
 

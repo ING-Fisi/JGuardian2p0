@@ -43,7 +43,7 @@ const string logFileName = "JGuardian2p0.log";
 
 Logger::Logger()
 {
-   m_File.open(logFileName.c_str(), ios::out|ios::app);
+   m_File.open(logFileName.c_str(), ios::out|ios::trunc);
    m_LogLevel	= LOG_LEVEL_TRACE;
    m_LogType	= FILE_LOG;
 

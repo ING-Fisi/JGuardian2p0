@@ -1,4 +1,4 @@
-# Install script for directory: /home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_MP/main
+# Install script for directory: /home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_MP/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

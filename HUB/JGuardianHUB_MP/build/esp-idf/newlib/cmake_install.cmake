@@ -39,6 +39,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_MP/build/esp-idf/newlib/port/cmake_install.cmake")
+  include("/home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_MP/build/esp-idf/newlib/port/cmake_install.cmake")
 endif()
 

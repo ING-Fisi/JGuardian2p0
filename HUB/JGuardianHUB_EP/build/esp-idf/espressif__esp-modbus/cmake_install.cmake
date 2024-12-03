@@ -1,4 +1,4 @@
-# Install script for directory: /home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_EP/managed_components/espressif__esp-modbus
+# Install script for directory: /home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_EP/managed_components/espressif__esp-modbus
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

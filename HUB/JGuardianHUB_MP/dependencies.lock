@@ -24,5 +24,5 @@ direct_dependencies:
 - idf
 - mb_example_common
 manifest_hash: 32632551e6f36d299af0964da1db82a7051128dd53f475ebb4cc0776786a7bbb
-target: esp32s3
+target: esp32
 version: 2.0.0
