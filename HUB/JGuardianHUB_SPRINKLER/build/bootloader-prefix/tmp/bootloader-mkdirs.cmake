@@ -5,18 +5,18 @@ cmake_minimum_required(VERSION 3.5)
 
 file(MAKE_DIRECTORY
   "/home/biglap/ESPRESSIF/esp-idf-v5.3.1/components/bootloader/subproject"
-  "/home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_SPRINKLER/build/bootloader"
-  "/home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix"
-  "/home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/tmp"
-  "/home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/src/bootloader-stamp"
-  "/home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/src"
-  "/home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/src/bootloader-stamp"
+  "/home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_SPRINKLER/build/bootloader"
+  "/home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix"
+  "/home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/tmp"
+  "/home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/src/bootloader-stamp"
+  "/home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/src"
+  "/home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/src/bootloader-stamp"
 )
 
 set(configSubDirs )
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "/home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
+    file(MAKE_DIRECTORY "/home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
 endforeach()
 if(cfgdir)
-  file(MAKE_DIRECTORY "/home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
+  file(MAKE_DIRECTORY "/home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_SPRINKLER/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
 endif()

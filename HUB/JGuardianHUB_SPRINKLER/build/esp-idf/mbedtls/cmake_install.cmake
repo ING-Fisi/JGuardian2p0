@@ -34,11 +34,11 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "/home/biglap/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20240530/xtensa-esp-elf/bin/xtensa-esp32-elf-objdump")
+  set(CMAKE_OBJDUMP "/home/biglap/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20240530/xtensa-esp-elf/bin/xtensa-esp32s3-elf-objdump")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/home/biglap/PROGETTI/GEI/JGUARDIAN2p0_HUB/JGuardianHUB_SPRINKLER/build/esp-idf/mbedtls/mbedtls/cmake_install.cmake")
+  include("/home/biglap/PROGETTI/GEI/JGuardian2p0/HUB/JGuardianHUB_SPRINKLER/build/esp-idf/mbedtls/mbedtls/cmake_install.cmake")
 endif()
 

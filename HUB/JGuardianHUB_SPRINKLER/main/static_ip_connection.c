@@ -17,6 +17,7 @@
 #include <netdb.h>
 #include "nvs_flash.h"
 #include "esp_http_server.h"
+#include "JGuardianHUB.h"
 
 extern httpd_handle_t server;
 extern httpd_handle_t start_JGuardian_SERVER();
@@ -30,7 +31,20 @@ extern httpd_handle_t start_JGuardian_SERVER();
 #define CONFIG_EXAMPLE_WIFI_SSID "FisitronHUB"
 #define CONFIG_EXAMPLE_WIFI_PASSWORD "Fisitron319086"
 #define CONFIG_EXAMPLE_MAXIMUM_RETRY 1000
-#define CONFIG_EXAMPLE_STATIC_IP_ADDR "10.100.0.99"
+
+#ifdef SPRINKLER1
+#define CONFIG_EXAMPLE_STATIC_IP_ADDR "10.100.0.91"
+#endif
+#ifdef SPRINKLER2
+#define CONFIG_EXAMPLE_STATIC_IP_ADDR "10.100.0.92"
+#endif
+#ifdef SPRINKLER3
+#define CONFIG_EXAMPLE_STATIC_IP_ADDR "10.100.0.93"
+#endif
+#ifdef SPRINKLER4
+#define CONFIG_EXAMPLE_STATIC_IP_ADDR "10.100.0.94"
+#endif
+
 #define CONFIG_EXAMPLE_STATIC_NETMASK_ADDR "255.255.255.0"
 #define CONFIG_EXAMPLE_STATIC_GW_ADDR "10.100.0.1"
 
@@ -61,7 +75,6 @@ static EventGroupHandle_t s_wifi_event_group;
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
 
-static const char *TAG = "static_ip";
 
 static int s_retry_num = 0;
 

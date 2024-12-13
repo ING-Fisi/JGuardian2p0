@@ -105,8 +105,8 @@ void app_main(void) {
   io_conf_2.pull_down_en = 0;
   io_conf_2.pull_up_en = 0;
   gpio_config(&io_conf_2);
-  
-    // zero-initialize the config structure.
+
+  // zero-initialize the config structure.
   gpio_config_t io_conf_3 = {};
   io_conf_3.intr_type = GPIO_INTR_DISABLE;
   io_conf_3.mode = GPIO_MODE_INPUT_OUTPUT;
@@ -115,60 +115,30 @@ void app_main(void) {
   io_conf_3.pull_up_en = 0;
   gpio_config(&io_conf_3);
 
-  //		//zero-initialize the config structure.
-  //	gpio_config_t io_conf_3 = {};
-  //	io_conf_3.intr_type = GPIO_INTR_DISABLE;
-  //	io_conf_3.mode = GPIO_MODE_OUTPUT;
-  //	io_conf_3.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_3;
-  //	io_conf_3.pull_down_en = 0;
-  //	io_conf_3.pull_up_en = 0;
-  //	gpio_config(&io_conf_3);
+  // zero-initialize the config structure.
+  gpio_config_t io_conf_4 = {};
+  io_conf_4.intr_type = GPIO_INTR_DISABLE;
+  io_conf_4.mode = GPIO_MODE_INPUT_OUTPUT;
+  io_conf_4.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_4;
+  io_conf_4.pull_down_en = 0;
+  io_conf_4.pull_up_en = 0;
+  gpio_config(&io_conf_4);
 
-  //		//zero-initialize the config structure.
-  //	gpio_config_t io_conf_4 = {};
-  //	io_conf_4.intr_type = GPIO_INTR_DISABLE;
-  //	io_conf_4.mode = GPIO_MODE_OUTPUT;
-  //	io_conf_4.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_4;
-  //	io_conf_4.pull_down_en = 0;
-  //	io_conf_4.pull_up_en = 0;
-  //	gpio_config(&io_conf_4);
-  //
-  //			//zero-initialize the config structure.
-  //	gpio_config_t io_conf_5 = {};
-  //	io_conf_5.intr_type = GPIO_INTR_DISABLE;
-  //	io_conf_5.mode = GPIO_MODE_OUTPUT;
-  //	io_conf_5.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_5;
-  //	io_conf_5.pull_down_en = 0;
-  //	io_conf_5.pull_up_en = 0;
-  //	gpio_config(&io_conf_5);
-
-  //	//interrupt of rising edge
-  //	io_conf.intr_type = GPIO_INTR_DISABLE;
-  //	//bit mask of the pins, use GPIO4/5 here
-  //	io_conf.pin_bit_mask = GPIO_INPUT_PIN_SEL;
-  //	//set as input mode
-  //	io_conf.mode = GPIO_MODE_INPUT;
-  //	//enable pull-up mode
-  //	io_conf.pull_up_en = 1;
-  //
-  //	gpio_config(&io_conf);
-
-  //	//change gpio intrrupt type for one pin
-  //	gpio_set_intr_type(GPIO_INPUT_IO_0, GPIO_INTR_ANYEDGE);
-  //
-  //	//install gpio isr service
-  //	gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
-  //	//hook isr handler for specific gpio pin
-  //	gpio_isr_handler_add(GPIO_INPUT_IO_0, gpio_isr_handler, (void*)
-  //GPIO_INPUT_IO_0);
-
-  //	rele0_status = gpio_get_level(GPIO_INPUT_IO_0);
-  //	rele1_status = gpio_get_level(GPIO_INPUT_IO_1);
-  //	rele2_status = gpio_get_level(GPIO_INPUT_IO_0);
+  // zero-initialize the config structure.
+  gpio_config_t io_conf_5 = {};
+  io_conf_5.intr_type = GPIO_INTR_DISABLE;
+  io_conf_5.mode = GPIO_MODE_INPUT_OUTPUT;
+  io_conf_5.pin_bit_mask = GPIO_OUTPUT_PIN_SEL_5;
+  io_conf_5.pull_down_en = 0;
+  io_conf_5.pull_up_en = 0;
+  gpio_config(&io_conf_5);
 
   gpio_set_level(GPIO_OUTPUT_IO_1, false);
   gpio_set_level(GPIO_OUTPUT_IO_2, false);
   gpio_set_level(GPIO_OUTPUT_IO_3, false);
+  gpio_set_level(GPIO_OUTPUT_IO_4, false);
+  gpio_set_level(GPIO_OUTPUT_IO_5, false);
+  gpio_set_level(GPIO_OUTPUT_IO_6, false);
   gpio_set_level(GPIO_OUTPUT_IO_LED, true);
 
   //*********************************************************/

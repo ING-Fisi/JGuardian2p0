@@ -131,6 +131,15 @@ static esp_err_t set_rele_post_handler(httpd_req_t *req) {
 
   sscanf(buf, "RELE[%d][%d]", &rele_id, &rele_status);
 
+  if ((rele_id == 0) && (rele_status == 0)) {
+    ESP_LOGI(TAG, "RESET GPIO");
+
+    gpio_set_level(GPIO_OUTPUT_IO_1, false);
+    gpio_set_level(GPIO_OUTPUT_IO_2, false);
+    gpio_set_level(GPIO_OUTPUT_IO_3, false);
+    gpio_set_level(GPIO_OUTPUT_IO_4, false);
+  }
+
   if ((rele_id == 1) && (rele_status == 1)) {
     ESP_LOGI(TAG, "RELE1_ON");
     gpio_set_level(GPIO_OUTPUT_IO_1, true);

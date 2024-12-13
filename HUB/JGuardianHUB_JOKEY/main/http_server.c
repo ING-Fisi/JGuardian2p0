@@ -51,7 +51,7 @@ static esp_err_t request_get_rele_status(httpd_req_t *req) {
   int r1 = gpio_get_level(GPIO_OUTPUT_IO_1);
   int r2 = gpio_get_level(GPIO_OUTPUT_IO_2);
   int r3 = gpio_get_level(GPIO_OUTPUT_IO_3);
-  int r4 = 0;
+  int r4 = gpio_get_level(GPIO_OUTPUT_IO_4);
 
   ESP_LOGI(TAG, "STATUS RELE %d %d %d %d", r1, r2, r3, r4);
 
@@ -102,6 +102,15 @@ static esp_err_t set_rele_post_handler(httpd_req_t *req) {
   int rele_status = 0;
 
   sscanf(buf, "RELE[%d][%d]", &rele_id, &rele_status);
+  
+    if ((rele_id == 0) && (rele_status == 0)) {
+    ESP_LOGI(TAG, "RESET GPIO");
+
+    gpio_set_level(GPIO_OUTPUT_IO_1, false);
+    gpio_set_level(GPIO_OUTPUT_IO_2, false);
+    gpio_set_level(GPIO_OUTPUT_IO_3, false);
+    gpio_set_level(GPIO_OUTPUT_IO_4, false);
+  }
 
   if ((rele_id == 1) && (rele_status == 1)) {
     ESP_LOGI(TAG, "RELE1_ON");
@@ -127,16 +136,14 @@ static esp_err_t set_rele_post_handler(httpd_req_t *req) {
     ESP_LOGI(TAG, "RELE3_OFF");
     gpio_set_level(GPIO_OUTPUT_IO_3, false);
   }
-  //	if((rele_id == 4)&&(rele_status == 1))
-  //    {
-  //		ESP_LOGI(TAG, "RELE4_ON");
-  //		gpio_set_level(GPIO_OUTPUT_IO_4, true);
-  //	}
-  //	 if((rele_id == 4)&&(rele_status == 0))
-  //    {
-  //		ESP_LOGI(TAG, "RELE4_OFF");
-  //		gpio_set_level(GPIO_OUTPUT_IO_4, false);
-  //	}
+  if ((rele_id == 4) && (rele_status == 1)) {
+    ESP_LOGI(TAG, "RELE4_ON");
+    gpio_set_level(GPIO_OUTPUT_IO_4, true);
+  }
+  if ((rele_id == 4) && (rele_status == 0)) {
+    ESP_LOGI(TAG, "RELE4_OFF");
+    gpio_set_level(GPIO_OUTPUT_IO_4, false);
+  }
 
   // End response
   httpd_resp_send_chunk(req, NULL, 0);
