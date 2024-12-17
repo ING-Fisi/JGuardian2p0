@@ -73,11 +73,7 @@ typedef enum machine_type
     ELETTROPOMPA_MB,
     ELETTROPOMPA_RELE,
     JOKEY,
-    SPRINKLER1,
-    SPRINKLER2,
-    SPRINKLER3,
-    SPRINKLER4
-
+    SPRINKLER,
 }machine_type;
 
 std::string response_string_modbus_MP;
@@ -89,10 +85,6 @@ std::string response_string_rele_EP;
 std::string response_string_JOKEY;
 
 std::string response_string_SPRINKLER1;
-std::string response_string_SPRINKLER2;
-std::string response_string_SPRINKLER3;
-std::string response_string_SPRINKLER4;
-
 
 CURL* curl_MP_GET_MODBUS;
 CURL* curl_MP_GET_RELE_STATUS;
@@ -129,19 +121,10 @@ CURL* curl_SPRINKLER1_GET_RELE_STATUS;
 CURL* curl_SPRINKLER1_RESET_GPIO;
 CURL* curl_SPRINKLER1_SET_EV_ON;
 CURL* curl_SPRINKLER1_SET_EV_OFF;
-
-//CURL* curl_SPRINKLER2_GET_RELE_STATUS;
-//CURL* curl_SPRINKLER2_RESET_GPIO;
 CURL* curl_SPRINKLER2_SET_EV_ON;
 CURL* curl_SPRINKLER2_SET_EV_OFF;
-
-//CURL* curl_SPRINKLER3_GET_RELE_STATUS;
-//CURL* curl_SPRINKLER3_RESET_GPIO;
 CURL* curl_SPRINKLER3_SET_EV_ON;
 CURL* curl_SPRINKLER3_SET_EV_OFF;
-
-//CURL* curl_SPRINKLER4_GET_RELE_STATUS;
-//CURL* curl_SPRINKLER4_RESET_GPIO;
 CURL* curl_SPRINKLER4_SET_EV_ON;
 CURL* curl_SPRINKLER4_SET_EV_OFF;
 
@@ -162,7 +145,7 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
                 std::ostringstream ss;
                 ss << endl;
                 ss << "\t" << "curl_easy_perform() MOTOPOMPA failed " << curl_easy_strerror(res)<< endl;
-                pLogger->info(ss);
+                pLogger->error(ss);
             }
 
             return true;
@@ -181,7 +164,7 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
                 std::ostringstream ss;
                 ss << endl;
                 ss << "\t" << "curl_easy_perform() MOTOPOMPA failed " << curl_easy_strerror(res)<< endl;
-                pLogger->info(ss);
+                pLogger->error(ss);
             }
 
             return true;
@@ -200,7 +183,7 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
                 std::ostringstream ss;
                 ss << endl;
                 ss << "\t" << "curl_easy_perform() ELETTROPOMPA failed " << curl_easy_strerror(res)<< endl;
-                pLogger->info(ss);
+                pLogger->error(ss);
             }
             return true;
         }
@@ -218,7 +201,7 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
                 std::ostringstream ss;
                 ss << endl;
                 ss << "\t" << "curl_easy_perform() ELETTROPOMPA failed " << curl_easy_strerror(res)<< endl;
-                pLogger->info(ss);
+                pLogger->error(ss);
             }
             return true;
         }
@@ -237,14 +220,14 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
                 std::ostringstream ss;
                 ss << endl;
                 ss << "\t" << "curl_easy_perform() JOKEY failed " << curl_easy_strerror(res)<< endl;
-                pLogger->info(ss);
+                pLogger->error(ss);
             }
             return true;
         }
 
         break;
 
-    case SPRINKLER1:
+    case SPRINKLER:
 
         if (curl_req) {
             response_string_SPRINKLER1.clear();
@@ -256,64 +239,7 @@ bool send_curl_request(machine_type mt,CURL* curl_req)
                 std::ostringstream ss;
                 ss << endl;
                 ss << "\t" << "curl_easy_perform() SPRINKLER1 failed " << curl_easy_strerror(res)<< endl;
-                pLogger->info(ss);
-            }
-            return true;
-        }
-
-        break;
-
-    case SPRINKLER2:
-
-        if (curl_req) {
-            response_string_SPRINKLER2.clear();
-            CURLcode res = curl_easy_perform(curl_req);
-            /* Check for errors */
-            if(res != CURLE_OK)
-            {
-                printf("curl_easy_perform() SPRINKLER2 failed: %s\r\n",curl_easy_strerror(res));
-                std::ostringstream ss;
-                ss << endl;
-                ss << "\t" << "curl_easy_perform() SPRINKLER2 failed " << curl_easy_strerror(res)<< endl;
-                pLogger->info(ss);
-            }
-            return true;
-        }
-
-        break;
-
-    case SPRINKLER3:
-
-        if (curl_req) {
-            response_string_SPRINKLER3.clear();
-            CURLcode res = curl_easy_perform(curl_req);
-            /* Check for errors */
-            if(res != CURLE_OK)
-            {
-                printf("curl_easy_perform() SPRINKLER3 failed: %s\r\n",curl_easy_strerror(res));
-                std::ostringstream ss;
-                ss << endl;
-                ss << "\t" << "curl_easy_perform() SPRINKLER3 failed " << curl_easy_strerror(res)<< endl;
-                pLogger->info(ss);
-            }
-            return true;
-        }
-
-        break;
-
-    case SPRINKLER4:
-
-        if (curl_req) {
-            response_string_SPRINKLER4.clear();
-            CURLcode res = curl_easy_perform(curl_req);
-            /* Check for errors */
-            if(res != CURLE_OK)
-            {
-                printf("curl_easy_perform() SPRINKLER4 failed: %s\r\n",curl_easy_strerror(res));
-                std::ostringstream ss;
-                ss << endl;
-                ss << "\t" << "curl_easy_perform() SPRINKLER4 failed " << curl_easy_strerror(res)<< endl;
-                pLogger->info(ss);
+                pLogger->error(ss);
             }
             return true;
         }
@@ -373,6 +299,13 @@ bool line_rele_start_sp4_status = false;
 #define SENSORE_PRESSIONE_B_OFFSET 10479
 
 
+//0bar 10479 -> 9.2bar 34200
+// 34200 - 10479 =
+
+#define SENSORE_PRESSIONE_A_2_20m 19500
+#define SENSORE_PRESSIONE_B_16BAR 59478
+
+
 int sensore_pressione_a = 0;
 int sensore_pressione_b = 0;
 //***********************************************************************//
@@ -424,12 +357,7 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
         send_curl_request(MOTOPOMPA_RELE,curl_MP_RESET_GPIO);
         send_curl_request(ELETTROPOMPA_RELE,curl_EP_RESET_GPIO);
         send_curl_request(JOKEY,curl_JOKEY_RESET_GPIO);
-        send_curl_request(SPRINKLER1,curl_SPRINKLER1_RESET_GPIO);
-        //send_curl_request(SPRINKLER2,curl_SPRINKLER2_RESET_GPIO);
-        //send_curl_request(SPRINKLER3,curl_SPRINKLER3_RESET_GPIO);
-        //send_curl_request(SPRINKLER4,curl_SPRINKLER4_RESET_GPIO);
-
-
+        send_curl_request(SPRINKLER,curl_SPRINKLER1_RESET_GPIO);
         //**************************************************************//
 
         gpio_write(PORT_RELE_NVR, OFFSET_RELE_NVR, 0);
@@ -624,58 +552,58 @@ int messageArrived(void *context, char *topicName, int topicLen, MQTTAsync_messa
     if(strcmp(messagePayload,REMOTE_START_SP1) == 0 )
     {
         printf("COMANDO curl_SPRINKLER1_SET_EV_ON\r\n");
-        send_curl_request(SPRINKLER1,curl_SPRINKLER1_SET_EV_ON);
+        send_curl_request(SPRINKLER,curl_SPRINKLER1_SET_EV_ON);
         //line_rele_start_sp_status = true;
     }
 
     else if(strcmp(messagePayload,REMOTE_STOP_SP1) == 0 )
     {
         printf("COMANDO curl_SPRINKLER1_SET_EV_OFF\r\n");
-        send_curl_request(SPRINKLER1,curl_SPRINKLER1_SET_EV_OFF);
+        send_curl_request(SPRINKLER,curl_SPRINKLER1_SET_EV_OFF);
         //line_rele_start_sp_status = false;
     }
 
     if(strcmp(messagePayload,REMOTE_START_SP2) == 0 )
     {
         printf("COMANDO curl_SPRINKLER2_SET_EV_ON\r\n");
-        send_curl_request(SPRINKLER1,curl_SPRINKLER2_SET_EV_ON);
+        send_curl_request(SPRINKLER,curl_SPRINKLER2_SET_EV_ON);
         //line_rele_start_sp_status = true;
     }
 
     else if(strcmp(messagePayload,REMOTE_STOP_SP2) == 0 )
     {
         printf("COMANDO curl_SPRINKLER2_SET_EV_OFF\r\n");
-        send_curl_request(SPRINKLER1,curl_SPRINKLER2_SET_EV_OFF);
+        send_curl_request(SPRINKLER,curl_SPRINKLER2_SET_EV_OFF);
         //line_rele_start_sp_status = false;
     }
 
     if(strcmp(messagePayload,REMOTE_START_SP3) == 0 )
     {
         printf("COMANDO curl_SPRINKLER3_SET_EV_ON\r\n");
-        send_curl_request(SPRINKLER1,curl_SPRINKLER3_SET_EV_ON);
+        send_curl_request(SPRINKLER,curl_SPRINKLER3_SET_EV_ON);
         //line_rele_start_sp_status = true;
     }
 
     else if(strcmp(messagePayload,REMOTE_STOP_SP3) == 0 )
     {
         printf("COMANDO curl_SPRINKLER3_SET_EV_OFF\r\n");
-        send_curl_request(SPRINKLER1,curl_SPRINKLER3_SET_EV_OFF);
+        send_curl_request(SPRINKLER,curl_SPRINKLER3_SET_EV_OFF);
         //line_rele_start_sp_status = false;
     }
 
-//    if(strcmp(messagePayload,REMOTE_START_SP4) == 0 )
-//    {
-//        printf("COMANDO curl_JOKEY_SET_START_ON\r\n");
-//        send_curl_request(JOKEY,curl_SPRINKLER4_SET_EV_ON);
-//        //line_rele_start_sp_status = true;
-//    }
+    //    if(strcmp(messagePayload,REMOTE_START_SP4) == 0 )
+    //    {
+    //        printf("COMANDO curl_JOKEY_SET_START_ON\r\n");
+    //        send_curl_request(JOKEY,curl_SPRINKLER4_SET_EV_ON);
+    //        //line_rele_start_sp_status = true;
+    //    }
 
-//    else if(strcmp(messagePayload,REMOTE_STOP_SP4) == 0 )
-//    {
-//        printf("COMANDO curl_JOKEY_SET_START_OFF\r\n");
-//        send_curl_request(JOKEY,curl_SPRINKLER4_SET_EV_OFF);
-//        //line_rele_start_sp_status = false;
-//    }
+    //    else if(strcmp(messagePayload,REMOTE_STOP_SP4) == 0 )
+    //    {
+    //        printf("COMANDO curl_JOKEY_SET_START_OFF\r\n");
+    //        send_curl_request(JOKEY,curl_SPRINKLER4_SET_EV_OFF);
+    //        //line_rele_start_sp_status = false;
+    //    }
 
 
     MQTTAsync_freeMessage(&message);
@@ -694,7 +622,7 @@ void connlost(void *context, char *cause)
     std::ostringstream ss;
     ss << endl;
     ss << "\t" << "Connection lost";
-    pLogger->info(ss);
+    pLogger->error(ss);
 
 
     sleep(5);
@@ -717,7 +645,7 @@ void onConnectFailure(void* context, MQTTAsync_failureData* response)
     std::ostringstream ss;
     ss << endl;
     ss << "\t" << "CLIENT Connect failed, rc " << response->code << response->message;
-    pLogger->info(ss);
+    pLogger->error(ss);
 
     sleep(5);
 
@@ -737,8 +665,7 @@ void onConnect(void* context, MQTTAsync_successData* response)
     MQTTAsync_responseOptions opts = MQTTAsync_responseOptions_initializer;
     int rc;
 
-    printf("Subscribing to topic %s\nfor client %s using QoS%d\n\n"
-           "Press Q<Enter> to quit\n\n", TOPIC_SUB, CLIENTID, QOS);
+    printf("Subscribing to topic %s\nfor client %s using QoS%d\n\n", TOPIC_SUB, CLIENTID, QOS);
     opts.onSuccess = NULL;
     opts.onFailure = NULL;
     opts.context = client;
@@ -748,7 +675,7 @@ void onConnect(void* context, MQTTAsync_successData* response)
         std::ostringstream ss;
         ss << endl;
         ss << "\t" << "Failed to start subscribe, return code" << rc;
-        pLogger->info(ss);
+        pLogger->error(ss);
 
     }
 
@@ -802,7 +729,7 @@ bool mqtt_connection(void)
         std::ostringstream ss;
         ss << endl;
         ss << "\t" << "Failed to start connect, return code %d" << rc << endl;
-        pLogger->info(ss);
+        pLogger->error(ss);
         //exit(EXIT_FAILURE);
 
         return false;
@@ -815,6 +742,10 @@ bool mqtt_connection(void)
 
 
 //****************************************************************************************//
+#define FW_VERSION "FW VER 1.0.0 " __DATE__ " " __TIME__
+
+
+
 int main(int argc, char* argv[])
 {
 
@@ -847,7 +778,7 @@ int main(int argc, char* argv[])
     printf("START JGUARDIAN 2p0");
     std::ostringstream ss;
     ss << endl;
-    ss << "\t" << "Start JGuardian 2p0 DONE" ;
+    ss << "\t" << "Start JGuardian 2p0 " << FW_VERSION;
     pLogger->info(ss);
 
     //******************************MOTOPOMPA************************//
@@ -1112,28 +1043,6 @@ int main(int argc, char* argv[])
         curl_easy_setopt(curl_SPRINKLER1_SET_EV_OFF, CURLOPT_POSTFIELDS, SET_RELE1_OFF);
     }
 
-//    std::string header_string_SPRINKLER2;
-
-//    curl_SPRINKLER2_GET_RELE_STATUS = curl_easy_init();
-//    if (curl_SPRINKLER2_GET_RELE_STATUS) {
-//        curl_easy_setopt(curl_SPRINKLER2_GET_RELE_STATUS, CURLOPT_URL, CURL_GETURI_RELE_SP2);
-//        curl_easy_setopt(curl_SPRINKLER2_GET_RELE_STATUS, CURLOPT_NOPROGRESS, 1L);
-//        curl_easy_setopt(curl_SPRINKLER2_GET_RELE_STATUS, CURLOPT_MAXREDIRS, 50L);
-//        curl_easy_setopt(curl_SPRINKLER2_GET_RELE_STATUS, CURLOPT_TCP_KEEPALIVE, 1L);
-//        curl_easy_setopt(curl_SPRINKLER2_GET_RELE_STATUS, CURLOPT_TIMEOUT_MS, 1000);
-
-
-//        curl_easy_setopt(curl_SPRINKLER2_GET_RELE_STATUS, CURLOPT_WRITEFUNCTION, writeFunction);
-//        curl_easy_setopt(curl_SPRINKLER2_GET_RELE_STATUS, CURLOPT_WRITEDATA, &response_string_SPRINKLER2);
-//        curl_easy_setopt(curl_SPRINKLER2_GET_RELE_STATUS, CURLOPT_HEADERDATA, &header_string_SPRINKLER2);
-//    }
-
-//    curl_SPRINKLER2_RESET_GPIO = curl_easy_init();
-//    if (curl_SPRINKLER2_RESET_GPIO) {
-//        curl_easy_setopt(curl_SPRINKLER2_RESET_GPIO, CURLOPT_URL, CURL_SETURI_SP2);
-//        curl_easy_setopt(curl_SPRINKLER2_RESET_GPIO, CURLOPT_POSTFIELDS, RESET_GPIO);
-//    }
-
     curl_SPRINKLER2_SET_EV_ON = curl_easy_init();
     if (curl_SPRINKLER2_SET_EV_ON) {
         curl_easy_setopt(curl_SPRINKLER2_SET_EV_ON, CURLOPT_URL, CURL_SETURI_SP);
@@ -1146,27 +1055,6 @@ int main(int argc, char* argv[])
         curl_easy_setopt(curl_SPRINKLER2_SET_EV_OFF, CURLOPT_POSTFIELDS, SET_RELE2_OFF);
     }
 
-//    std::string header_string_SPRINKLER3;
-
-//    curl_SPRINKLER3_GET_RELE_STATUS = curl_easy_init();
-//    if (curl_SPRINKLER3_GET_RELE_STATUS) {
-//        curl_easy_setopt(curl_SPRINKLER3_GET_RELE_STATUS, CURLOPT_URL, CURL_GETURI_RELE_SP3);
-//        curl_easy_setopt(curl_SPRINKLER3_GET_RELE_STATUS, CURLOPT_NOPROGRESS, 1L);
-//        curl_easy_setopt(curl_SPRINKLER3_GET_RELE_STATUS, CURLOPT_MAXREDIRS, 50L);
-//        curl_easy_setopt(curl_SPRINKLER3_GET_RELE_STATUS, CURLOPT_TCP_KEEPALIVE, 1L);
-//        curl_easy_setopt(curl_SPRINKLER3_GET_RELE_STATUS, CURLOPT_TIMEOUT_MS, 1000);
-
-
-//        curl_easy_setopt(curl_SPRINKLER3_GET_RELE_STATUS, CURLOPT_WRITEFUNCTION, writeFunction);
-//        curl_easy_setopt(curl_SPRINKLER3_GET_RELE_STATUS, CURLOPT_WRITEDATA, &response_string_SPRINKLER3);
-//        curl_easy_setopt(curl_SPRINKLER3_GET_RELE_STATUS, CURLOPT_HEADERDATA, &header_string_SPRINKLER3);
-//    }
-
-//    curl_SPRINKLER3_RESET_GPIO = curl_easy_init();
-//    if (curl_SPRINKLER3_RESET_GPIO) {
-//        curl_easy_setopt(curl_SPRINKLER3_RESET_GPIO, CURLOPT_URL, CURL_SETURI_SP3);
-//        curl_easy_setopt(curl_SPRINKLER3_RESET_GPIO, CURLOPT_POSTFIELDS, RESET_GPIO);
-//    }
 
     curl_SPRINKLER3_SET_EV_ON = curl_easy_init();
     if (curl_SPRINKLER3_SET_EV_ON) {
@@ -1180,53 +1068,14 @@ int main(int argc, char* argv[])
         curl_easy_setopt(curl_SPRINKLER3_SET_EV_OFF, CURLOPT_POSTFIELDS, SET_RELE3_OFF);
     }
 
-//    std::string header_string_SPRINKLER4;
-
-//    curl_SPRINKLER4_GET_RELE_STATUS = curl_easy_init();
-//    if (curl_SPRINKLER4_GET_RELE_STATUS) {
-//        curl_easy_setopt(curl_SPRINKLER4_GET_RELE_STATUS, CURLOPT_URL, CURL_GETURI_RELE_SP4);
-//        curl_easy_setopt(curl_SPRINKLER4_GET_RELE_STATUS, CURLOPT_NOPROGRESS, 1L);
-//        curl_easy_setopt(curl_SPRINKLER4_GET_RELE_STATUS, CURLOPT_MAXREDIRS, 50L);
-//        curl_easy_setopt(curl_SPRINKLER4_GET_RELE_STATUS, CURLOPT_TCP_KEEPALIVE, 1L);
-//        curl_easy_setopt(curl_SPRINKLER4_GET_RELE_STATUS, CURLOPT_TIMEOUT_MS, 1000);
-
-
-//        curl_easy_setopt(curl_SPRINKLER4_GET_RELE_STATUS, CURLOPT_WRITEFUNCTION, writeFunction);
-//        curl_easy_setopt(curl_SPRINKLER4_GET_RELE_STATUS, CURLOPT_WRITEDATA, &response_string_SPRINKLER4);
-//        curl_easy_setopt(curl_SPRINKLER4_GET_RELE_STATUS, CURLOPT_HEADERDATA, &header_string_SPRINKLER4);
-//    }
-
-//    curl_SPRINKLER4_RESET_GPIO = curl_easy_init();
-//    if (curl_SPRINKLER4_RESET_GPIO) {
-//        curl_easy_setopt(curl_SPRINKLER4_RESET_GPIO, CURLOPT_URL, CURL_SETURI_SP4);
-//        curl_easy_setopt(curl_SPRINKLER4_RESET_GPIO, CURLOPT_POSTFIELDS, RESET_GPIO);
-//    }
-
-//    curl_SPRINKLER4_SET_EV_ON = curl_easy_init();
-//    if (curl_SPRINKLER4_SET_EV_ON) {
-//        curl_easy_setopt(curl_SPRINKLER4_SET_EV_ON, CURLOPT_URL, CURL_SETURI_SP4);
-//        curl_easy_setopt(curl_SPRINKLER4_SET_EV_ON, CURLOPT_POSTFIELDS, SET_RELE1_ON);
-//    }
-
-//    curl_SPRINKLER4_SET_EV_OFF = curl_easy_init();
-//    if (curl_SPRINKLER4_SET_EV_OFF) {
-//        curl_easy_setopt(curl_SPRINKLER4_SET_EV_OFF, CURLOPT_URL, CURL_SETURI_SP4);
-//        curl_easy_setopt(curl_SPRINKLER4_SET_EV_OFF, CURLOPT_POSTFIELDS, SET_RELE1_OFF);
-//    }
-
 
     //********************** RESET RELE ***************************//
     send_curl_request(MOTOPOMPA_RELE,curl_MP_RESET_GPIO);
     send_curl_request(ELETTROPOMPA_RELE,curl_EP_RESET_GPIO);
     send_curl_request(JOKEY,curl_JOKEY_RESET_GPIO);
-    send_curl_request(SPRINKLER1,curl_SPRINKLER1_RESET_GPIO);
-    //send_curl_request(SPRINKLER2,curl_SPRINKLER2_RESET_GPIO);
-    //send_curl_request(SPRINKLER3,curl_SPRINKLER3_RESET_GPIO);
-    //send_curl_request(SPRINKLER4,curl_SPRINKLER4_RESET_GPIO);
-
+    send_curl_request(SPRINKLER,curl_SPRINKLER1_RESET_GPIO);
 
     sleep(3);
-
 
     //*************************************************************//
 
@@ -1244,15 +1093,10 @@ int main(int argc, char* argv[])
 
         send_curl_request(JOKEY,curl_JOKEY_GET_RELE_STATUS);
 
-        send_curl_request(SPRINKLER1,curl_SPRINKLER1_GET_RELE_STATUS);
-        //send_curl_request(SPRINKLER2,curl_SPRINKLER2_GET_RELE_STATUS);
-        //send_curl_request(SPRINKLER3,curl_SPRINKLER3_GET_RELE_STATUS);
-        //send_curl_request(SPRINKLER4,curl_SPRINKLER4_GET_RELE_STATUS);
+        send_curl_request(SPRINKLER,curl_SPRINKLER1_GET_RELE_STATUS);
 
         //*********************************************************//
         int index_reg = 0;
-
-
 
         //**************************************************************//
         //*************************** EP *******************************//
@@ -1405,27 +1249,6 @@ int main(int argc, char* argv[])
             //line_rele_start_sp1_status = std::stoul(array_sp1_rele[0],nullptr,0);
         }
 
-//        std::vector<std::string> array_sp2_rele = split(response_string_SPRINKLER2,',');
-
-//        if(array_sp2_rele.size() == 4)
-//        {
-//            line_rele_start_sp2_status = std::stoul(array_sp2_rele[0],nullptr,0);
-//        }
-
-//        std::vector<std::string> array_sp3_rele = split(response_string_SPRINKLER3,',');
-
-//        if(array_sp3_rele.size() == 4)
-//        {
-//            line_rele_start_sp3_status = std::stoul(array_sp3_rele[0],nullptr,0);
-//        }
-
-//        std::vector<std::string> array_sp4_rele = split(response_string_SPRINKLER4,',');
-
-//        if(array_sp4_rele.size() == 4)
-//        {
-//            line_rele_start_sp4_status = std::stoul(array_sp4_rele[0],nullptr,0);
-//        }
-
         //************************************************************************************//
 
         printf("\r\n MOTO_POMPA %s %s\r\n ELETTRO_POMPA %s %s\r\n JOKEY %s\r\n SPRINKLER1 %s\r\n",
@@ -1435,11 +1258,7 @@ int main(int argc, char* argv[])
                response_string_rele_EP.c_str(),
                response_string_JOKEY.c_str(),
                response_string_SPRINKLER1.c_str()
-               //response_string_SPRINKLER2.c_str(),
-               //response_string_SPRINKLER3.c_str(),
-               //response_string_SPRINKLER4.c_str()
-               ); // @suppress("Method cannot be resolved")
-
+               );
 
 
         int ad_value6_ch0=0;
@@ -1452,31 +1271,30 @@ int main(int argc, char* argv[])
         read_ADvalue_row_ch1((char*)"in_voltage2_raw",&ad_value2_ch1);
         read_ADvalue_row_ch1((char*)"in_voltage6_raw",&ad_value6_ch1);
 
-        sensore_pressione_a = (((ad_value6_ch1 - SENSORE_PRESSIONE_A_OFFSET) / 2453) * 1000);
-        sensore_pressione_b = (((ad_value2_ch1 - SENSORE_PRESSIONE_B_OFFSET) / 2453) * 1000);
 
+
+
+
+        sensore_pressione_b = (1000  * ad_value13_ch0) / SENSORE_PRESSIONE_A_2_20m;
+
+        sensore_pressione_a = ( 1000 * ad_value2_ch1 ) /SENSORE_PRESSIONE_B_16BAR;
 
         //printf("\r\n ANALOG CHANNEL [%d][%d][%d][%d]\r\n",ad_value6_ch0,ad_value13_ch0,sensore_pressione_b,sensore_pressione_a);
-        printf("\r\n ANALOG CHANNEL [%d][%d][%d][%d]\r\n",ad_value6_ch0,ad_value13_ch0,ad_value2_ch1,ad_value6_ch1);
+        printf("\r\n ANALOG CHANNEL [%d][%d][%d][%d]\r\n",ad_value13_ch0,ad_value2_ch1,sensore_pressione_a,sensore_pressione_b);
 
 
-        std::ostringstream ss;
-        ss << "\t" << "MOTO_POMPA MODBUS" << response_string_modbus_MP;
-        ss << "\t" << "MOTO_POMPA RELE" << response_string_rele_MP << endl;
+        //        std::ostringstream ss;
+        //        ss << "\t" << "MOTO_POMPA MODBUS" << response_string_modbus_MP;
+        //        ss << "\t" << "MOTO_POMPA RELE" << response_string_rele_MP << endl;
 
-        ss << "\t" << "ELETTRO_POMPA MODBUS" << response_string_modbus_EP;
-        ss << "\t" << "ELETTRO_POMPA RELE" << response_string_rele_EP << endl;
+        //        ss << "\t" << "ELETTRO_POMPA MODBUS" << response_string_modbus_EP;
+        //        ss << "\t" << "ELETTRO_POMPA RELE" << response_string_rele_EP << endl;
 
-        ss << "\t" << "JOKEY RELE" << response_string_JOKEY << endl;
+        //        ss << "\t" << "JOKEY RELE" << response_string_JOKEY << endl;
 
-        ss << "\t" << "SPRINKLER1 RELE" << response_string_SPRINKLER1 << endl;
-        //ss << "\t" << "SPRINKLER2 RELE" << response_string_SPRINKLER2 << endl;
-        //ss << "\t" << "SPRINKLER3 RELE" << response_string_SPRINKLER3 << endl;
-        //ss << "\t" << "SPRINKLER4 RELE" << response_string_SPRINKLER4 << endl;
+        //        ss << "\t" << "SPRINKLER1 RELE" << response_string_SPRINKLER1 << endl;
 
-
-
-        pLogger->info(ss);
+        //        pLogger->info(ss);
 
 
         //****************************************************************************************************//
@@ -1676,11 +1494,11 @@ int main(int argc, char* argv[])
             pLogger->error(ss);
         }
 
-        usleep(500000);
+        sleep(1);//0.5s
     }
     else
     {
-        usleep(100000);
+        sleep(10);
     }
 
     if(toggle)
